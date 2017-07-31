@@ -11,44 +11,62 @@ public class RxRetrofitApp {
     private static Application application;
     private static boolean debug;
     private static String BaseUrl;
+    private static String ProgressMassge;
+    private static RxRetrofitApp rxRetrofitApp;
 
-    /**
-     * http库初始化
-     * @param app Application
-     */
-    public static void init(Application app){
-        init(app,true,"");
+    public RxRetrofitApp(Application application) {
+        this.application = application;
     }
 
-    /**
-     * http库初始化
-     * @param app Application
-     * @param debug 是否打印log
-     */
-    public static void init(Application app,boolean debug){
-        init(app,debug,"");
+    public static RxRetrofitApp Create(Application application)
+    {
+        if(rxRetrofitApp==null)
+        {
+            rxRetrofitApp = new RxRetrofitApp(application);
+        }
+        return rxRetrofitApp;
     }
 
-    /**
-     * http库初始化
-     * @param app Application
-     * @param baseUrl  基础url
-     */
-    public static void init(Application app,String baseUrl){
-        init(app,true,baseUrl);
-    }
 
-    /**
-     * http库初始化
-     * @param app Application
-     * @param debug 是否打印log
-     * @param baseUrl 基础url
-     */
-    public static void init(Application app,boolean debug,String baseUrl){
-        setApplication(app);
-        setDebug(debug);
-        setBaseUrl(baseUrl);
-    }
+//    /**
+//     * http库初始化
+//     * @param app Application
+//     */
+//    public static void init(Application app){
+//        if(rxRetrofitApp)
+//        init(app,true,"");
+//    }
+//
+//    /**
+//     * http库初始化
+//     * @param app Application
+//     * @param debug 是否打印log
+//     */
+//    public static RxRetrofitApp init(Application app,boolean debug){
+//        init(app,debug,"");
+//        return RxRetrofitApp.this;
+//    }
+//
+//    /**
+//     * http库初始化
+//     * @param app Application
+//     * @param baseUrl  基础url
+//     */
+//    public static RxRetrofitApp init(Application app,String baseUrl){
+//        init(app,true,baseUrl);
+//    }
+//
+//    /**
+//     * http库初始化
+//     * @param app Application
+//     * @param debug 是否打印log
+//     * @param baseUrl 基础url
+//     */
+//    public static void init(Application app,boolean debug,String baseUrl){
+//        setApplication(app);
+//        setDebug(debug);
+//        setBaseUrl(baseUrl);
+//    }
 
 
     public static Application getApplication() {
@@ -63,15 +81,26 @@ public class RxRetrofitApp {
         return debug;
     }
 
-    public static void setDebug(boolean debug) {
+    public  RxRetrofitApp setDebug(boolean debug) {
         RxRetrofitApp.debug = debug;
+        return rxRetrofitApp;
     }
 
     public static String getBaseUrl() {
         return BaseUrl;
     }
 
-    public static void setBaseUrl(String baseUrl) {
+    public  RxRetrofitApp setBaseUrl(String baseUrl) {
         BaseUrl = baseUrl;
+        return rxRetrofitApp;
+    }
+
+    public  static String getProgressMassge() {
+        return ProgressMassge;
+    }
+
+    public  RxRetrofitApp setProgressMassge(String progressMassge) {
+        ProgressMassge = progressMassge;
+        return rxRetrofitApp;
     }
 }

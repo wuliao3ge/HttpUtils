@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 import com.yy.HttpUtils.R;
+import com.yy.HttpUtils.activity.progress.CustomProgressDialog;
 import com.yy.HttpUtils.entity.api.CombinApi;
 import com.yy.HttpUtils.entity.resulte.BaseResultEntity;
 import com.yy.HttpUtils.entity.resulte.SubjectResulte;
@@ -26,13 +27,14 @@ import java.util.ArrayList;
 public class CombinApiActivity extends RxAppCompatActivity implements HttpOnNextListener {
     private TextView tvMsg;
     CombinApi api;
-
+    private CustomProgressDialog progressDilaog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_combin_api);
-
         api = new CombinApi(this, this);
+//        progressDilaog = new CustomProgressDialog(this);
+//        api.setProgress(progressDilaog);
         tvMsg = (TextView) findViewById(R.id.tv_msg);
         findViewById(R.id.btn_rx_all).setOnClickListener(new View.OnClickListener() {
             @Override

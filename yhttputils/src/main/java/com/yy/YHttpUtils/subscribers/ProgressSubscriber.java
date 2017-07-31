@@ -39,7 +39,7 @@ public class ProgressSubscriber<T> implements Observer<T> {
     //    软引用反正内存泄露
     private SoftReference<Context> mActivity;
     //    加载框可自己定义
-    private ProgressDialog pd;
+    private ProgressAbs pd;
     /*请求数据*/
     private BaseApi api;
 
@@ -53,6 +53,7 @@ public class ProgressSubscriber<T> implements Observer<T> {
     public ProgressSubscriber(BaseApi api, SoftReference<HttpOnNextListener> listenerSoftReference, SoftReference<Context>
             mActivity) {
         this.api = api;
+        this.pd = api.getProgress();
         this.mSubscriberOnNextListener = listenerSoftReference;
         this.mActivity = mActivity;
         setShowPorgress(api.isShowProgress());
@@ -68,16 +69,18 @@ public class ProgressSubscriber<T> implements Observer<T> {
     private void initProgressDialog(boolean cancel) {
         Context context = mActivity.get();
         if (pd == null && context != null) {
-            pd = new ProgressDialog(context);
-            pd.setCancelable(cancel);
-            if (cancel) {
-                pd.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialogInterface) {
-                        onCancelProgress();
-                    }
-                });
-            }
+            pd = new DefaultProgress(context);
+        }
+        pd.setProgressMessage(api.getProgressMassge());
+        pd.setCancelable(cancel);
+        if (cancel) {
+            pd.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialogInterface) {
+                    onCancelProgress();
+                    pd.onCance();
+                }
+            });
         }
     }
 
@@ -89,8 +92,8 @@ public class ProgressSubscriber<T> implements Observer<T> {
         if (!isShowPorgress()) return;
         Context context = mActivity.get();
         if (pd == null || context == null) return;
-        if (!pd.isShowing()) {
-            pd.show();
+        if (!pd.isProgressShowing()) {
+            pd.Progressshow();
         }
     }
 
@@ -100,8 +103,8 @@ public class ProgressSubscriber<T> implements Observer<T> {
      */
     private void dismissProgressDialog() {
         if (!isShowPorgress()) return;
-        if (pd != null && pd.isShowing()) {
-            pd.dismiss();
+        if (pd != null && pd.isProgressShowing()) {
+            pd.dismissProgress();
         }
     }
 

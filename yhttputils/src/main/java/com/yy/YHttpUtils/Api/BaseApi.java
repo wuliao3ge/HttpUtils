@@ -1,6 +1,8 @@
 package com.yy.YHttpUtils.Api;
 
 import com.yy.YHttpUtils.RxRetrofitApp;
+import com.yy.YHttpUtils.subscribers.ProgressAbs;
+import com.yy.YHttpUtils.subscribers.ProgressInterface;
 
 import io.reactivex.Observable;
 import retrofit2.Retrofit;
@@ -11,7 +13,7 @@ import retrofit2.Retrofit;
 
 public abstract class BaseApi {
     /*是否能取消加载框*/
-    private boolean cancel = false;
+    private boolean cancel = true;
     /*是否显示加载框*/
     private boolean showProgress = true;
     /*是否需要缓存处理*/
@@ -34,6 +36,14 @@ public abstract class BaseApi {
     private long retryIncreaseDelay = 100;
     /*缓存url-可手动设置*/
     private String cacheUrl;
+    /**
+     * 自定义对话框
+     */
+    private ProgressAbs progress;
+    /**
+     * 提示消息
+     */
+    private String ProgressMassge = RxRetrofitApp.getProgressMassge();
 
     /**
      * 设置参数
@@ -147,6 +157,23 @@ public abstract class BaseApi {
 
     public void setCacheUrl(String cacheUrl) {
         this.cacheUrl = cacheUrl;
+    }
+
+
+    public ProgressAbs getProgress() {
+        return progress;
+    }
+
+    public void setProgress(ProgressAbs progress) {
+        this.progress = progress;
+    }
+
+    public String getProgressMassge() {
+        return ProgressMassge;
+    }
+
+    public void setProgressMassge(String progressMassge) {
+        ProgressMassge = progressMassge;
     }
 }
 

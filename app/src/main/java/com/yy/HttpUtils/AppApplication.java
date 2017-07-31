@@ -12,6 +12,11 @@ public class AppApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        RxRetrofitApp.init(this,"https://www.izaodao.com/Api/");
+//        RxRetrofitApp.init(this,"https://www.izaodao.com/Api/");
+        RxRetrofitApp.Create(this)
+                .setBaseUrl("https://www.izaodao.com/Api/")
+                .setDebug(true)
+                .setProgressMassge("请求数据中,请稍等……");
+
     }
 }

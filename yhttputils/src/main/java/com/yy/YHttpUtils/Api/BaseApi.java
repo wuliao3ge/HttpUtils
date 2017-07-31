@@ -13,7 +13,7 @@ import retrofit2.Retrofit;
 
 public abstract class BaseApi {
     /*是否能取消加载框*/
-    private boolean cancel = true;
+    private boolean cancel = false;
     /*是否显示加载框*/
     private boolean showProgress = true;
     /*是否需要缓存处理*/

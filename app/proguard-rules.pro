@@ -88,10 +88,6 @@
 -keep class com.yy.YHttpUtils.exception.** { *; }
 -keep class com.yy.YHttpUtils.downlaod.** {*; }
 
-
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
 -dontwarn javax.annotation.**
 -dontwarn javax.inject.**
 # OkHttp3

@@ -131,7 +131,9 @@ public class HttpManager {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
             @Override
             public void log(String message) {
-                Log.d("RxRetrofit", "Retrofit====Message:" + message);
+                if (RxRetrofitApp.isDebug()) {
+                    Log.d("RxRetrofit", "Retrofit====Message:" + message);
+                }
             }
         });
         loggingInterceptor.setLevel(level);

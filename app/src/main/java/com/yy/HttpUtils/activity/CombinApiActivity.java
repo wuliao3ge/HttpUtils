@@ -12,6 +12,7 @@ import com.yy.HttpUtils.activity.progress.CustomProgressDialog;
 import com.yy.HttpUtils.entity.api.CombinApi;
 import com.yy.HttpUtils.entity.resulte.BaseResultEntity;
 import com.yy.HttpUtils.entity.resulte.SubjectResulte;
+import com.yy.YHttpUtils.Base.YRxBaseActivity;
 import com.yy.YHttpUtils.exception.ApiException;
 import com.yy.YHttpUtils.listener.HttpOnNextListener;
 
@@ -24,7 +25,7 @@ import java.util.ArrayList;
  *
  * @author wzg
  */
-public class CombinApiActivity extends RxAppCompatActivity implements HttpOnNextListener {
+public class CombinApiActivity extends YRxBaseActivity  {
     private TextView tvMsg;
     CombinApi api;
     private CustomProgressDialog progressDilaog;

@@ -23,10 +23,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.DownLaodActivity">
-        </activity>
-        <activity android:name=".activity.CombinApiActivity">
-        </activity>
+        <activity android:name=".activity.DownLaodActivity"></activity>
+        <activity android:name=".activity.CombinApiActivity"></activity>
+        <activity android:name=".activity.FragmentHttpAcitivity"></activity>
     </application>
 
 </manifest>

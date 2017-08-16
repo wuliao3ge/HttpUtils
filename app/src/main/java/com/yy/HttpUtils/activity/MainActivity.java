@@ -53,6 +53,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
         findViewById(R.id.btn_rx_all).setOnClickListener(this);
         findViewById(R.id.btn_rx_mu_down).setOnClickListener(this);
         findViewById(R.id.btn_rx_uploade).setOnClickListener(this);
+        findViewById(R.id.btn_rx_mu_fr).setOnClickListener(this);
         img = (ImageView) findViewById(R.id.img);
         progressBar = (NumberProgressBar) findViewById(R.id.number_progress_bar);
 
@@ -106,6 +107,10 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
             case R.id.btn_rx_mu_down:
                 Intent intent = new Intent(this, DownLaodActivity.class);
                 startActivity(intent);
+                break;
+            case R.id.btn_rx_mu_fr:
+                Intent intent1 = new Intent(this, FragmentHttpAcitivity.class);
+                startActivity(intent1);
                 break;
         }
     }

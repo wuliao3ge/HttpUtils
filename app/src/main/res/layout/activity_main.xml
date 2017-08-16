@@ -34,7 +34,11 @@
         android:layout_height="wrap_content"
         android:text="多任务断点续传下载"/>
 
-
+    <Button
+        android:id="@+id/btn_rx_mu_fr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="fragment"/>
 
 
     <com.daimajia.numberprogressbar.NumberProgressBar

@@ -10,6 +10,8 @@ import com.yy.YHttpUtils.listener.HttpOnNextListener;
 
 public class YRxBaseActivity extends RxAppCompatActivity implements HttpOnNextListener {
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

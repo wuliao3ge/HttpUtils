@@ -7,13 +7,13 @@
 //import android.widget.TextView;
 //
 //import com.yy.HttpUtils.R;
-//import com.yy.YHttpUtils.subscribers.ProgressAbs;
+//import com.yy.YHttpUtils.base.BaseProgress;
 //
 ///**
 // * Created by ly on 2017/7/28.
 // */
 //
-//public class ProgressDilaog extends ProgressAbs {
+//public class ProgressDilaog extends BaseProgress {
 //
 //    private static CustomProgressDialog dialog;
 //

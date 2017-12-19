@@ -9,12 +9,15 @@ import android.app.Application;
 
 public class RxRetrofitApp {
     private static Application application;
+    /** 是否 */
     private static boolean debug;
     private static String BaseUrl;
     private static String ProgressMassge;
     private static RxRetrofitApp rxRetrofitApp;
+    private static int downConnectonTime=6;
 
-    public RxRetrofitApp(Application application) {
+
+    private RxRetrofitApp(Application application) {
         this.application = application;
     }
 
@@ -26,47 +29,6 @@ public class RxRetrofitApp {
         }
         return rxRetrofitApp;
     }
-
-
-//    /**
-//     * http库初始化
-//     * @param app Application
-//     */
-//    public static void init(Application app){
-//        if(rxRetrofitApp)
-//        init(app,true,"");
-//    }
-//
-//    /**
-//     * http库初始化
-//     * @param app Application
-//     * @param debug 是否打印log
-//     */
-//    public static RxRetrofitApp init(Application app,boolean debug){
-//        init(app,debug,"");
-//        return RxRetrofitApp.this;
-//    }
-//
-//    /**
-//     * http库初始化
-//     * @param app Application
-//     * @param baseUrl  基础url
-//     */
-//    public static RxRetrofitApp init(Application app,String baseUrl){
-//        init(app,true,baseUrl);
-//    }
-//
-//    /**
-//     * http库初始化
-//     * @param app Application
-//     * @param debug 是否打印log
-//     * @param baseUrl 基础url
-//     */
-//    public static void init(Application app,boolean debug,String baseUrl){
-//        setApplication(app);
-//        setDebug(debug);
-//        setBaseUrl(baseUrl);
-//    }
 
 
     public static Application getApplication() {
@@ -93,6 +55,15 @@ public class RxRetrofitApp {
     public  RxRetrofitApp setBaseUrl(String baseUrl) {
         BaseUrl = baseUrl;
         return rxRetrofitApp;
+    }
+
+    public RxRetrofitApp setDownConnectonTime(int downConnectonTime) {
+        this.downConnectonTime = downConnectonTime;
+        return rxRetrofitApp;
+    }
+
+    public static int getDownConnectonTime() {
+        return downConnectonTime;
     }
 
     public  static String getProgressMassge() {

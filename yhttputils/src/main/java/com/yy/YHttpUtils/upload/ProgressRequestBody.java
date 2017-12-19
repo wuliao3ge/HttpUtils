@@ -1,4 +1,6 @@
-package com.yy.YHttpUtils.listener.upload;
+package com.yy.YHttpUtils.upload;
+
+import com.yy.YHttpUtils.listener.UploadProgressListener;
 
 import java.io.IOException;
 

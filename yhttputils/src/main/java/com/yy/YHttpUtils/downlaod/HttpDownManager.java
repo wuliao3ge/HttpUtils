@@ -4,7 +4,6 @@ import com.yy.YHttpUtils.downlaod.DownLoadListener.DownloadInterceptor;
 import com.yy.YHttpUtils.downlaod.exception.RetryWhenNetworkException;
 import com.yy.YHttpUtils.exception.HttpTimeException;
 import com.yy.YHttpUtils.subscribers.ProgressDownSubscriber;
-import com.yy.YHttpUtils.utils.DbDwonUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,8 +16,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
@@ -44,13 +41,11 @@ public class HttpDownManager {
     private HashMap<String, ProgressDownSubscriber> subMap;
     /*单利对象*/
     private volatile static HttpDownManager INSTANCE;
-    /*数据库类*/
-    private DbDwonUtil db;
+
 
     private HttpDownManager() {
         downInfos = new HashSet<>();
         subMap = new HashMap<>();
-        db = DbDwonUtil.getInstance();
     }
 
     /**
@@ -74,14 +69,14 @@ public class HttpDownManager {
      * 开始下载
      */
     public void startDown(final DownInfo info) {
-        /*正在下载不处理*/
         if (info == null || subMap.get(info.getUrl()) != null) {
             subMap.get(info.getUrl()).setDownInfo(info);
             return;
         }
+
         /*添加回调处理类*/
         ProgressDownSubscriber subscriber = new ProgressDownSubscriber(info);
-        /*记录回调sub*/
+         /*记录回调sub*/
         subMap.put(info.getUrl(), subscriber);
         /*获取service，多次请求公用一个sercie*/
         HttpDownService httpService;
@@ -139,8 +134,6 @@ public class HttpDownManager {
             subscriber.unsubscribe();
             subMap.remove(info.getUrl());
         }
-        /*保存数据库信息和本地文件*/
-        db.save(info);
     }
 
 
@@ -158,31 +151,31 @@ public class HttpDownManager {
             subscriber.unsubscribe();
             subMap.remove(info.getUrl());
         }
-        /*这里需要讲info信息写入到数据中，可自由扩展，用自己项目的数据库*/
-        db.update(info);
+//        /*这里需要讲info信息写入到数据中，可自由扩展，用自己项目的数据库*/
+//        db.update(info);
     }
 
-    /**
-     * 停止全部下载
-     */
-    public void stopAllDown() {
-        for (DownInfo downInfo : downInfos) {
-            stopDown(downInfo);
-        }
-        subMap.clear();
-        downInfos.clear();
-    }
-
-    /**
-     * 暂停全部下载
-     */
-    public void pauseAll() {
-        for (DownInfo downInfo : downInfos) {
-            pause(downInfo);
-        }
-        subMap.clear();
-        downInfos.clear();
-    }
+//    /**
+//     * 停止全部下载
+//     */
+//    public void stopAllDown() {
+//        for (DownInfo downInfo : downInfos) {
+//            stopDown(downInfo);
+//        }
+//        subMap.clear();
+//        downInfos.clear();
+//    }
+//
+//    /**
+//     * 暂停全部下载
+//     */
+//    public void pauseAll() {
+//        for (DownInfo downInfo : downInfos) {
+//            pause(downInfo);
+//        }
+//        subMap.clear();
+//        downInfos.clear();
+//    }
 
 
     /**
@@ -190,9 +183,9 @@ public class HttpDownManager {
      *
      * @return
      */
-    public Set<DownInfo> getDownInfos() {
-        return downInfos;
-    }
+//    public Set<DownInfo> getDownInfos() {
+//        return downInfos;
+//    }
 
     /**
      * 移除下载数据

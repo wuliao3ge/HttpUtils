@@ -2,7 +2,7 @@ package com.yy.HttpUtils.entity.api;
 
 
 import com.yy.HttpUtils.HttpPostService;
-import com.yy.YHttpUtils.Api.BaseApi;
+import com.yy.YHttpUtils.api.BaseApi;
 
 import io.reactivex.Observable;
 import retrofit2.Retrofit;
@@ -27,7 +27,6 @@ public class SubjectPostApi extends BaseApi {
      * 设置可查看BaseApi
      */
     public SubjectPostApi() {
-        setCache(false);
         setMethod("AppFiftyToneGraph/videoLink");
     }
 

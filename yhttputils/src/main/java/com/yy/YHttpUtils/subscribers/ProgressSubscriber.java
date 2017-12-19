@@ -1,20 +1,19 @@
 package com.yy.YHttpUtils.subscribers;
 
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
 
-import com.yy.YHttpUtils.Api.BaseApi;
+import com.yy.YHttpUtils.api.BaseApi;
 import com.yy.YHttpUtils.RxRetrofitApp;
+import com.yy.YHttpUtils.base.BaseProgress;
 import com.yy.YHttpUtils.exception.ApiException;
 import com.yy.YHttpUtils.exception.CodeException;
 import com.yy.YHttpUtils.exception.HttpTimeException;
-import com.yy.YHttpUtils.http.cookie.CookieResulte;
+//import com.yy.YHttpUtils.http.cookie.CookieResulte;
 import com.yy.YHttpUtils.listener.HttpOnNextListener;
-import com.yy.YHttpUtils.utils.AppUtil;
-import com.yy.YHttpUtils.utils.CookieDbUtil;
+
 
 import java.lang.ref.SoftReference;
 
@@ -39,7 +38,7 @@ public class ProgressSubscriber<T> implements Observer<T> {
     //    软引用反正内存泄露
     private SoftReference<Context> mActivity;
     //    加载框可自己定义
-    private ProgressAbs pd;
+    private BaseProgress pd;
     /*请求数据*/
     private BaseApi api;
 
@@ -50,7 +49,7 @@ public class ProgressSubscriber<T> implements Observer<T> {
      *
      * @param api
      */
-    public ProgressSubscriber(BaseApi api, SoftReference<HttpOnNextListener> listenerSoftReference, SoftReference<Context>
+    public ProgressSubscriber(BaseApi api,SoftReference<HttpOnNextListener>  listenerSoftReference, SoftReference<Context>
             mActivity) {
         this.api = api;
         this.pd = api.getProgress();
@@ -93,7 +92,7 @@ public class ProgressSubscriber<T> implements Observer<T> {
         Context context = mActivity.get();
         if (pd == null || context == null) return;
         if (!pd.isProgressShowing()) {
-            pd.Progressshow();
+            pd.progressShow();
         }
     }
 
@@ -150,11 +149,11 @@ public class ProgressSubscriber<T> implements Observer<T> {
     @Override
     public void onError(Throwable e) {
         /*需要緩存并且本地有缓存才返回*/
-        if (api.isCache()) {
-            getCache();
-        } else {
+//        if (api.isCache()) {
+//            getCache();
+//        } else {
             errorDo(e);
-        }
+//        }
         dismissProgressDialog();
     }
 
@@ -163,27 +162,27 @@ public class ProgressSubscriber<T> implements Observer<T> {
      * 获取cache数据
      */
     private void getCache() {
-        Observable.just(api.getUrl()).subscribe(new Consumer<String>() {
-
-
-            @Override
-            public void accept(String s) throws Exception {
-                           /*获取缓存数据*/
-                CookieResulte cookieResulte = CookieDbUtil.getInstance().queryCookieBy(s);
-                if (cookieResulte == null) {
-                    throw new HttpTimeException(HttpTimeException.NO_CHACHE_ERROR);
-                }
-                long time = (System.currentTimeMillis() - cookieResulte.getTime()) / 1000;
-                if (time < api.getCookieNoNetWorkTime()) {
-                    if (mSubscriberOnNextListener.get() != null) {
-                        mSubscriberOnNextListener.get().onNext(cookieResulte.getResulte(), api.getMethod());
-                    }
-                } else {
-                    CookieDbUtil.getInstance().deleteCookie(cookieResulte);
-                    throw new HttpTimeException(HttpTimeException.CHACHE_TIMEOUT_ERROR);
-                }
-            }
-        });
+//        Observable.just(api.getUrl()).subscribe(new Consumer<String>() {
+//
+//
+//            @Override
+//            public void accept(String s) throws Exception {
+//                           /*获取缓存数据*/
+//                CookieResulte cookieResulte = CookieDbUtil.getInstance().queryCookieBy(s);
+//                if (cookieResulte == null) {
+//                    throw new HttpTimeException(HttpTimeException.NO_CHACHE_ERROR);
+//                }
+//                long time = (System.currentTimeMillis() - cookieResulte.getTime()) / 1000;
+//                if (time < api.getCookieNoNetWorkTime()) {
+//                    if (mSubscriberOnNextListener.get() != null) {
+//                        mSubscriberOnNextListener.get().onNext(cookieResulte.getResulte(), api.getMethod());
+//                    }
+//                } else {
+//                    CookieDbUtil.getInstance().deleteCookie(cookieResulte);
+//                    throw new HttpTimeException(HttpTimeException.CHACHE_TIMEOUT_ERROR);
+//                }
+//            }
+//        });
     }
 
 
@@ -217,21 +216,22 @@ public class ProgressSubscriber<T> implements Observer<T> {
     public void onSubscribe(@NonNull Disposable d) {
         this.mDisposable = d;
         showProgressDialog();
-        /*缓存并且有网*/
-        if (api.isCache() && AppUtil.isNetworkAvailable(RxRetrofitApp.getApplication())) {
-             /*获取缓存数据*/
-            CookieResulte cookieResulte = CookieDbUtil.getInstance().queryCookieBy(api.getUrl());
-            if (cookieResulte != null) {
-                long time = (System.currentTimeMillis() - cookieResulte.getTime()) / 1000;
-                if (time < api.getCookieNetWorkTime()) {
-                    if (mSubscriberOnNextListener.get() != null) {
-                        mSubscriberOnNextListener.get().onNext(cookieResulte.getResulte(), api.getMethod());
-                    }
-                    onComplete();
-                    mDisposable.dispose();
-                }
-            }
-        }
+
+//        /*缓存并且有网*/
+//        if (api.isCache() && AppUtil.isNetworkAvailable(RxRetrofitApp.getApplication())) {
+//             /*获取缓存数据*/
+//            CookieResulte cookieResulte = CookieDbUtil.getInstance().queryCookieBy(api.getUrl());
+//            if (cookieResulte != null) {
+//                long time = (System.currentTimeMillis() - cookieResulte.getTime()) / 1000;
+//                if (time < api.getCookieNetWorkTime()) {
+//                    if (mSubscriberOnNextListener.get() != null) {
+//                        mSubscriberOnNextListener.get().onNext(cookieResulte.getResulte(), api.getMethod());
+//                    }
+//                    onComplete();
+//                    mDisposable.dispose();
+//                }
+//            }
+//        }
     }
 
     /**
@@ -241,21 +241,21 @@ public class ProgressSubscriber<T> implements Observer<T> {
      */
     @Override
     public void onNext(T t) {
-         /*缓存处理*/
-        if (api.isCache()) {
-            CookieResulte resulte = CookieDbUtil.getInstance().queryCookieBy(api.getUrl());
-            long time = System.currentTimeMillis();
-            /*保存和更新本地数据*/
-            if (resulte == null) {
-                resulte = new CookieResulte(api.getUrl(), t.toString(), time);
-                CookieDbUtil.getInstance().saveCookie(resulte);
-            } else {
-                resulte.setResulte(t.toString());
-                resulte.setTime(time);
-                CookieDbUtil.getInstance().updateCookie(resulte);
-            }
-        }
-        if (mSubscriberOnNextListener.get() != null) {
+//         /*缓存处理*/
+//        if (api.isCache()) {
+//            CookieResulte resulte = CookieDbUtil.getInstance().queryCookieBy(api.getUrl());
+//            long time = System.currentTimeMillis();
+//            /*保存和更新本地数据*/
+//            if (resulte == null) {
+//                resulte = new CookieResulte(api.getUrl(), t.toString(), time);
+//                CookieDbUtil.getInstance().saveCookie(resulte);
+//            } else {
+//                resulte.setResulte(t.toString());
+//                resulte.setTime(time);
+//                CookieDbUtil.getInstance().updateCookie(resulte);
+//            }
+//        }
+        if (mSubscriberOnNextListener != null) {
             mSubscriberOnNextListener.get().onNext((String) t, api.getMethod());
         }
     }

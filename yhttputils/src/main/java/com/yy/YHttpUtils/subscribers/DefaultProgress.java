@@ -2,14 +2,14 @@ package com.yy.YHttpUtils.subscribers;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.util.Log;
+
+import com.yy.YHttpUtils.base.BaseProgress;
 
 /**
  * Created by ly on 2017/7/28.
  */
 
-public class DefaultProgress extends ProgressAbs {
+public class DefaultProgress extends BaseProgress {
 
     private ProgressDialog pd;
 
@@ -47,7 +47,7 @@ public class DefaultProgress extends ProgressAbs {
         return pd.isShowing();
     }
     @Override
-    public void Progressshow() {
+    public void progressShow() {
         pd.show();
     }
     @Override

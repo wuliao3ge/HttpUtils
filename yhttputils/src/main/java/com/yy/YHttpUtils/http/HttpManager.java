@@ -1,15 +1,15 @@
 package com.yy.YHttpUtils.http;
 
+import android.content.Context;
 import android.util.Log;
 
-import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
-import com.yy.YHttpUtils.Api.BaseApi;
+import com.trello.rxlifecycle2.LifecycleProvider;
+import com.yy.YHttpUtils.api.BaseApi;
 import com.yy.YHttpUtils.RxRetrofitApp;
 import com.yy.YHttpUtils.exception.RetryWhenNetworkException;
 import com.yy.YHttpUtils.http.func.ExceptionFunc;
 import com.yy.YHttpUtils.http.func.ResulteFunc;
 import com.yy.YHttpUtils.listener.HttpOnNextListener;
-import com.yy.YHttpUtils.listener.HttpOnNextSubListener;
 import com.yy.YHttpUtils.subscribers.ProgressSubscriber;
 
 import java.lang.ref.SoftReference;
@@ -28,23 +28,50 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
  * http交互处理类
  * Created by ly on 17-7-25.
  */
-
 public class HttpManager {
     /*软引用對象*/
     private SoftReference<HttpOnNextListener> onNextListener;
-    private SoftReference<HttpOnNextSubListener> onNextSubListener;
-    private SoftReference<RxAppCompatActivity> appCompatActivity;
-
-    public HttpManager(HttpOnNextListener onNextListener, RxAppCompatActivity appCompatActivity) {
-        this.onNextListener = new SoftReference(onNextListener);
-        this.appCompatActivity = new SoftReference(appCompatActivity);
+//    private HttpOnNextListener onNextListener;
+    private SoftReference<Context> context;
+    private SoftReference<LifecycleProvider> lifecycleProvider;
+    private static HttpManager httpManager;
+    public static HttpManager getInstance(){
+        if(httpManager ==null)
+        {
+            httpManager = new HttpManager();
+        }
+        return httpManager;
     }
 
-    public HttpManager(HttpOnNextSubListener onNextSubListener, RxAppCompatActivity appCompatActivity) {
-        this.onNextSubListener = new SoftReference(onNextSubListener);
-        this.appCompatActivity = new SoftReference(appCompatActivity);
+    /**
+     * 生命周期管理句柄
+     * @param lifecycleProvider
+     * @return
+     */
+    public HttpManager setLifecycle(LifecycleProvider lifecycleProvider) {
+        this.lifecycleProvider =  new SoftReference<>(lifecycleProvider);
+        return this;
     }
 
+    /**
+     * 用于对话框显示的句柄
+     * @param context
+     * @return
+     */
+    public HttpManager setContext(Context context) {
+        this.context = new SoftReference(context);
+        return this;
+    }
+
+    /**
+     * 返回数据监听
+     * @param onNextListener
+     * @return
+     */
+    public HttpManager setOnNextListener(HttpOnNextListener onNextListener){
+        this.onNextListener = new SoftReference<>(onNextListener);
+        return this;
+    }
 
     /**
      * 处理http请求
@@ -89,33 +116,27 @@ public class HttpManager {
      * @param basePar
      */
     public void httpDeal(Observable observable, BaseApi basePar) {
-          /*失败后的retry配置*/
-        observable = observable.retryWhen(new RetryWhenNetworkException(basePar.getRetryCount(),
-                basePar.getRetryDelay(), basePar.getRetryIncreaseDelay()))
+            observable = observable.retryWhen(new RetryWhenNetworkException(basePar.getRetryCount(),
+                    basePar.getRetryDelay(), basePar.getRetryIncreaseDelay()))
                 /*异常处理*/
-                .onErrorResumeNext(new ExceptionFunc())
+                    .onErrorResumeNext(new ExceptionFunc())
                 /*生命周期管理*/
-                .compose(appCompatActivity.get().bindToLifecycle())
-                //Note:手动设置在activity onDestroy的时候取消订阅
+                    .compose(lifecycleProvider.get().bindToLifecycle())
+                    //Note:手动设置在activity onDestroy的时候取消订阅
 //                .compose(appCompatActivity.get().bindUntilEvent(ActivityEvent.DESTROY))
                 /*返回数据统一判断*/
-                .map(new ResulteFunc())
+                    .map(new ResulteFunc())
                 /*http请求线程*/
-                .subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.io())
+                    .unsubscribeOn(Schedulers.io())
                 /*回调线程*/
-                .observeOn(AndroidSchedulers.mainThread());
-
-        /*ober回调，链接式返回*/
-        if (onNextSubListener != null && null != onNextSubListener.get()) {
-            onNextSubListener.get().onNext(observable, basePar.getMethod());
-        }
+                    .observeOn(AndroidSchedulers.mainThread());
 
         /*数据String回调*/
-        if (onNextListener != null && null != onNextListener.get()) {
-            ProgressSubscriber subscriber = new ProgressSubscriber(basePar, onNextListener, appCompatActivity);
-            observable.subscribe(subscriber);
-        }
+            if (onNextListener != null) {
+                ProgressSubscriber subscriber = new ProgressSubscriber(basePar, onNextListener, context);
+                observable.subscribe(subscriber);
+            }
     }
 
     /**

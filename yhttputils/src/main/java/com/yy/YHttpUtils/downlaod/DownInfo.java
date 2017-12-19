@@ -2,20 +2,12 @@ package com.yy.YHttpUtils.downlaod;
 
 import com.yy.YHttpUtils.listener.HttpDownOnNextListener;
 
-import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Generated;
-import org.greenrobot.greendao.annotation.Id;
-import org.greenrobot.greendao.annotation.Transient;
-
 /**
  * 断点续传数据库存储类
  * Created by ly on 17-7-26.
  */
 
-@Entity
 public class DownInfo{
-    @Id
-    private long id;
     /*存储位置*/
     private String savePath;
     /*文件总长度*/
@@ -23,10 +15,8 @@ public class DownInfo{
     /*下载长度*/
     private long readLength;
     /*下载唯一的HttpService*/
-    @Transient
     private HttpDownService service;
     /*回调监听*/
-    @Transient
     private HttpDownOnNextListener listener;
     /*超时设置*/
     private  int connectonTime=6;
@@ -44,10 +34,9 @@ public class DownInfo{
         setUrl(url);
     }
 
-    @Generated(hash = 656702907)
-    public DownInfo(long id, String savePath, long countLength, long readLength,
+
+    public DownInfo(String savePath, long countLength, long readLength,
                     int connectonTime, int stateInte, String url) {
-        this.id = id;
         this.savePath = savePath;
         this.countLength = countLength;
         this.readLength = readLength;
@@ -56,7 +45,7 @@ public class DownInfo{
         this.url = url;
     }
 
-    @Generated(hash = 928324469)
+
     public DownInfo() {
     }
 
@@ -140,14 +129,6 @@ public class DownInfo{
 
     public void setReadLength(long readLength) {
         this.readLength = readLength;
-    }
-
-    public long getId() {
-        return this.id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public int getConnectonTime() {

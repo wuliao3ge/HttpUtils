@@ -1,14 +1,11 @@
 package com.yy.YHttpUtils.subscribers;
 
 
-
 import com.yy.YHttpUtils.downlaod.DownInfo;
 import com.yy.YHttpUtils.downlaod.DownLoadListener.DownloadProgressListener;
 import com.yy.YHttpUtils.downlaod.DownState;
 import com.yy.YHttpUtils.downlaod.HttpDownManager;
 import com.yy.YHttpUtils.listener.HttpDownOnNextListener;
-import com.yy.YHttpUtils.utils.DbDwonUtil;
-
 
 import java.lang.ref.SoftReference;
 
@@ -82,7 +79,6 @@ public class ProgressDownSubscriber<T> implements Observer<T> , DownloadProgress
         }
         HttpDownManager.getInstance().remove(downInfo);
         downInfo.setState(DownState.ERROR);
-        DbDwonUtil.getInstance().update(downInfo);
     }
 
 
@@ -91,12 +87,12 @@ public class ProgressDownSubscriber<T> implements Observer<T> , DownloadProgress
      */
     @Override
     public void onComplete() {
+        downInfo.setState(DownState.FINISH);
         if(mSubscriberOnNextListener.get()!=null){
-            mSubscriberOnNextListener.get().onComplete();
+            mSubscriberOnNextListener.get().onComplete(downInfo);
         }
         HttpDownManager.getInstance().remove(downInfo);
-        downInfo.setState(DownState.FINISH);
-        DbDwonUtil.getInstance().update(downInfo);
+//        DbDwonUtil.getInstance().update(downInfo);
     }
 
 
@@ -128,7 +124,7 @@ public class ProgressDownSubscriber<T> implements Observer<T> , DownloadProgress
                         @Override
                         public void accept(Long aLong) throws Exception {
                              /*如果暂停或者停止状态延迟，不需要继续发送回调，影响显示*/
-                            if(downInfo.getState()==DownState.PAUSE||downInfo.getState()==DownState.STOP)return;
+                            if(downInfo.getState()== DownState.PAUSE||downInfo.getState()== DownState.STOP)return;
                             downInfo.setState(DownState.DOWN);
                             mSubscriberOnNextListener.get().updateProgress(aLong,downInfo.getCountLength());
                         }

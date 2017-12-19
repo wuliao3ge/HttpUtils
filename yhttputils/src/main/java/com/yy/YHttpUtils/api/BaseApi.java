@@ -1,8 +1,7 @@
-package com.yy.YHttpUtils.Api;
+package com.yy.YHttpUtils.api;
 
 import com.yy.YHttpUtils.RxRetrofitApp;
-import com.yy.YHttpUtils.subscribers.ProgressAbs;
-import com.yy.YHttpUtils.subscribers.ProgressInterface;
+import com.yy.YHttpUtils.base.BaseProgress;
 
 import io.reactivex.Observable;
 import retrofit2.Retrofit;
@@ -16,8 +15,8 @@ public abstract class BaseApi {
     private boolean cancel = false;
     /*是否显示加载框*/
     private boolean showProgress = true;
-    /*是否需要缓存处理*/
-    private boolean cache = false;
+//    /*是否需要缓存处理*/
+//    private boolean cache = false;
     /*基础url*/
     private String baseUrl = RxRetrofitApp.getBaseUrl();
     /*方法-如果需要缓存必须设置这个参数；不需要不用設置*/
@@ -34,12 +33,12 @@ public abstract class BaseApi {
     private long retryDelay = 100;
     /*retry叠加延迟*/
     private long retryIncreaseDelay = 100;
-    /*缓存url-可手动设置*/
-    private String cacheUrl;
+//    /*缓存url-可手动设置*/
+//    private String cacheUrl;
     /**
      * 自定义对话框
      */
-    private ProgressAbs progress;
+    private BaseProgress progress;
     /**
      * 提示消息
      */
@@ -87,21 +86,21 @@ public abstract class BaseApi {
         this.baseUrl = baseUrl;
     }
 
-    public String getUrl() {
-        /*在没有手动设置url情况下，简单拼接*/
-        if (null == getCacheUrl() || "".equals(getCacheUrl())) {
-            return getBaseUrl() + getMethod();
-        }
-        return getCacheUrl();
-    }
+//    public String getUrl() {
+//        /*在没有手动设置url情况下，简单拼接*/
+//        if (null == getCacheUrl() || "".equals(getCacheUrl())) {
+//            return getBaseUrl() + getMethod();
+//        }
+//        return getCacheUrl();
+//    }
 
-    public boolean isCache() {
-        return cache;
-    }
-
-    public void setCache(boolean cache) {
-        this.cache = cache;
-    }
+//    public boolean isCache() {
+//        return cache;
+//    }
+//
+//    public void setCache(boolean cache) {
+//        this.cache = cache;
+//    }
 
     public boolean isShowProgress() {
         return showProgress;
@@ -151,20 +150,20 @@ public abstract class BaseApi {
         this.retryIncreaseDelay = retryIncreaseDelay;
     }
 
-    public String getCacheUrl() {
-        return cacheUrl;
-    }
+//    public String getCacheUrl() {
+//        return cacheUrl;
+//    }
+//
+//    public void setCacheUrl(String cacheUrl) {
+//        this.cacheUrl = cacheUrl;
+//    }
 
-    public void setCacheUrl(String cacheUrl) {
-        this.cacheUrl = cacheUrl;
-    }
 
-
-    public ProgressAbs getProgress() {
+    public BaseProgress getProgress() {
         return progress;
     }
 
-    public void setProgress(ProgressAbs progress) {
+    public void setProgress(BaseProgress progress) {
         this.progress = progress;
     }
 

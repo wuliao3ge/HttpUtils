@@ -1,20 +1,18 @@
 package com.yy.HttpUtils.activity.progress;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.yy.HttpUtils.R;
-import com.yy.YHttpUtils.subscribers.ProgressAbs;
+import com.yy.YHttpUtils.base.BaseProgress;
 
 /**
  * Created by ly on 2017/7/28.
  */
 
-public class CustomProgressDialog extends ProgressAbs {
+public class CustomProgressDialog extends BaseProgress {
     private static CustomProgressDialog dialog;
     private static String message;
     private static Context mContext;
@@ -33,7 +31,7 @@ public class CustomProgressDialog extends ProgressAbs {
 
 
 
-    public void Progressshow() {
+    public void progressShow() {
         if (dialog == null) {
             dialog = new CustomProgressDialog(mContext, R.style.Custom_Progress);
         }
@@ -55,7 +53,7 @@ public class CustomProgressDialog extends ProgressAbs {
     }
 
     @Override
-    protected void onCance() {
+    public void onCance() {
 
     }
 
@@ -65,12 +63,12 @@ public class CustomProgressDialog extends ProgressAbs {
     }
 
     @Override
-    protected void setProgressCancelable(boolean flag) {
+    public void setProgressCancelable(boolean flag) {
 
     }
 
     @Override
-    protected void setProgressOnCancelListener(OnCancelListener onCancelListener) {
+    public void setProgressOnCancelListener(OnCancelListener onCancelListener) {
 
     }
 
@@ -80,12 +78,12 @@ public class CustomProgressDialog extends ProgressAbs {
     }
 
     @Override
-    protected void setProgressTitle(String s) {
+    public void setProgressTitle(String s) {
 
     }
 
     @Override
-    protected void setProgressTitle(int sid) {
+    public void setProgressTitle(int sid) {
 
     }
 

@@ -1,8 +1,9 @@
 package com.yy.HttpUtils.entity.api;
 
 
+
 import com.yy.HttpUtils.HttpUploadService;
-import com.yy.YHttpUtils.Api.BaseApi;
+import com.yy.YHttpUtils.api.BaseApi;
 
 import io.reactivex.Observable;
 import okhttp3.MediaType;
@@ -22,7 +23,7 @@ public class UploadApi extends BaseApi {
     public UploadApi() {
         setShowProgress(true);
         setMethod("AppYuFaKu/uploadHeadImg");
-        setCache(false);
+//        setCache(false);
     }
 
     public MultipartBody.Part getPart() {

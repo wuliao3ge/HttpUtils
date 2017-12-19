@@ -11,8 +11,8 @@ import android.view.ViewGroup;
 import com.trello.rxlifecycle2.components.support.RxFragment;
 import com.yy.HttpUtils.R;
 import com.yy.HttpUtils.entity.api.SubjectPostApi;
+import com.yy.HttpUtils.model.GetDataModel;
 import com.yy.YHttpUtils.exception.ApiException;
-import com.yy.YHttpUtils.http.FragHttpManager;
 import com.yy.YHttpUtils.listener.HttpOnNextListener;
 
 /**
@@ -26,9 +26,8 @@ import com.yy.YHttpUtils.listener.HttpOnNextListener;
 
 public class CombinApiFragment extends RxFragment implements HttpOnNextListener{
 
-    //    post请求接口信息
-    private SubjectPostApi postEntity;
-    private FragHttpManager fragHttpManager;
+    private GetDataModel getDataModel;
+
     public CombinApiFragment() {
         super();
     }
@@ -44,10 +43,10 @@ public class CombinApiFragment extends RxFragment implements HttpOnNextListener{
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        fragHttpManager = new FragHttpManager(this,CombinApiFragment.this);
-        postEntity = new SubjectPostApi();
-        postEntity.setAll(true);
-        fragHttpManager.doHttpDeal(postEntity);
+
+        getDataModel = new GetDataModel(getActivity(),this);
+
+        getDataModel.onClick();
     }
 
     @Override

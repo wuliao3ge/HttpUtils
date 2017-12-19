@@ -1,4 +1,4 @@
-package com.yy.YHttpUtils.listener.upload;
+package com.yy.YHttpUtils.listener;
 
 /**
  * 上传进度回调类

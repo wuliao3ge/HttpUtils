@@ -1,5 +1,7 @@
 package com.yy.YHttpUtils.listener;
 
+import com.yy.YHttpUtils.downlaod.DownInfo;
+
 /**
  * 下载过程中的回调处理
  * Created by ly on 17-7-26.
@@ -19,7 +21,7 @@ public abstract class HttpDownOnNextListener<T> {
     /**
      * 完成下载
      */
-    public abstract void onComplete();
+    public abstract void onComplete(DownInfo info);
 
 
 

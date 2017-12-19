@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'org.greenrobot.greendao'
 apply plugin: 'com.github.dcendents.android-maven'
 group = 'com.github.wuliao3ge'
 
@@ -24,12 +23,6 @@ android {
     }
 }
 
-greendao {
-    schemaVersion 1
-    daoPackage 'com.yy.YHttpUtils.greendao'
-    targetGenDir 'src/main/java'
-}
-
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     //    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -49,7 +42,6 @@ dependencies {
     compile 'com.trello.rxlifecycle2:rxlifecycle:2.1.0'
     compile 'com.trello.rxlifecycle2:rxlifecycle-components:2.1.0'
     compile 'com.squareup.okhttp3:logging-interceptor:3.8.1'
-    compile 'org.greenrobot:greendao:3.2.2'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
 }

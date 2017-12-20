@@ -12,7 +12,7 @@ Step 1. Add it in your root build.gradle at the end of repositories
 Step 2. Add the dependency
 
 	dependencies {
-	        compile 'com.github.wuliao3ge:HttpUtils:1.0.7'
+	        compile 'com.github.wuliao3ge:HttpUtils:1.0.8'
 	}
 	
 Step 3. Init
@@ -27,16 +27,14 @@ Step 3. Init
 
 Step 4. 混淆
 
--keep class com.yy.YHttpUtils.exception.** { *; }
--keep class com.yy.YHttpUtils.downlaod.** {*; }
-
+-keep class com.yy.yhttputils.** { *; }
 -dontwarn javax.annotation.**
 -dontwarn javax.inject.**
 
 -dontwarn okhttp3.logging.**
 
--keep class okhttp3.internal.**{*;}
--dontwarn okio.**
+-keep class okhttp3.internal.{*;}
+-dontwarn okio.
 
 -dontwarn retrofit2.**
 -keep class retrofit2.** { *; }
@@ -45,26 +43,18 @@ Step 4. 混淆
 -keepattributes Signature
 -keepattributes Exceptions
 
-
 -dontwarn sun.misc.**
--keepclassmembers class rx.internal.util.unsafe.*ArrayQueue*Field* {
-    long producerIndex;
-    long consumerIndex;
-}
--keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueProducerNodeRef {
-    rx.internal.util.atomic.LinkedQueueNode producerNode;
-}
--keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueConsumerNodeRef {
-    rx.internal.util.atomic.LinkedQueueNode consumerNode;
-}
-
-
--keepclassmembers class * extends org.greenrobot.greendao.AbstractDao {
-public static java.lang.String TABLENAME;
-}
--keep class **$Properties
--dontwarn org.greenrobot.greendao.database.**
--dontwarn rx.**
+-keepclassmembers class rx.internal.util.unsafe.ArrayQueueField* {
+    long producerIndex; long consumerIndex;
+ }
+ -keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueProducerNodeRef {
+ rx.internal.util.atomic.LinkedQueueNode producerNode;
+ }
+ -keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueConsumerNodeRef {
+  rx.internal.util.atomic.LinkedQueueNode consumerNode;
+  }
+-keep class $Properties
+ -dontwarn rx.**
 
 -dontwarn org.codehaus.**
 -dontwarn java.nio.**

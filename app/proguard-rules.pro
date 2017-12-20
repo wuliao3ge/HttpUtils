@@ -79,61 +79,44 @@
 #-dontwarn java.nio.**
 #-dontwarn java.lang.invoke.**
 
--keep class com.yy.HttpUtils.entity.** {*; }
+-keep class com.yy.httputils.entity.** {*; }
 #-------------------------------------------------------------------------
 
 #---------------------------------3.与js互相调用的类------------------------
 
 #----------------------------------第三方---------------------------------------
--keep class com.yy.YHttpUtils.exception.** { *; }
--keep class com.yy.YHttpUtils.downlaod.** {*; }
+-keep class com.yy.yhttputils.** { *; }
+
+-keep class com.yy.yhttputils.exception.** { *; }
+-keep class com.yy.yhttputils.downlaod.* {*; }
 
 -dontwarn javax.annotation.**
 -dontwarn javax.inject.**
-# OkHttp3
+
 -dontwarn okhttp3.logging.**
-#-dontwarn okhttp3.**
--keep class okhttp3.internal.**{*;}
--dontwarn okio.**
-# Retrofit
+
+-keep class okhttp3.internal.{*;}
+-dontwarn okio.
+
 -dontwarn retrofit2.**
 -keep class retrofit2.** { *; }
-# Platform calls Class.forName on types which do not exist on Android to determine platform.
 -dontnote retrofit2.Platform
-# Platform used when running on Java 8 VMs. Will not be used at runtime.
 -dontwarn retrofit2.Platform$Java8
-# Retain generic type information for use by reflection by converters and adapters.
 -keepattributes Signature
-# Retain declared checked exceptions for use by a Proxy instance.
 -keepattributes Exceptions
 
-# RxJava RxAndroid
 -dontwarn sun.misc.**
--keepclassmembers class rx.internal.util.unsafe.*ArrayQueue*Field* {
-    long producerIndex;
-    long consumerIndex;
-}
--keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueProducerNodeRef {
-    rx.internal.util.atomic.LinkedQueueNode producerNode;
-}
--keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueConsumerNodeRef {
-    rx.internal.util.atomic.LinkedQueueNode consumerNode;
-}
-
-
-
-#greendao3.2.0,此是针对3.2.0，如果是之前的，可能需要更换下包名
-### greenDAO 3
--keepclassmembers class * extends org.greenrobot.greendao.AbstractDao {
-public static java.lang.String TABLENAME;
-}
--keep class **$Properties
-
-# If you do not use SQLCipher:
--dontwarn org.greenrobot.greendao.database.**
-# If you do not use RxJava:
--dontwarn rx.**
-
+-keepclassmembers class rx.internal.util.unsafe.ArrayQueueField* {
+    long producerIndex; long consumerIndex;
+ }
+ -keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueProducerNodeRef {
+ rx.internal.util.atomic.LinkedQueueNode producerNode;
+ }
+ -keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueConsumerNodeRef {
+  rx.internal.util.atomic.LinkedQueueNode consumerNode;
+  }
+-keep class $Properties
+ -dontwarn rx.**
 
 -dontwarn org.codehaus.**
 -dontwarn java.nio.**

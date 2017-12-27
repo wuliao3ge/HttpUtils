@@ -1,5 +1,6 @@
 package com.yy.httputils.activity.fragment;
 
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -8,11 +9,20 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.trello.rxlifecycle2.components.support.RxFragment;
 import com.yy.httputils.R;
+import com.yy.httputils.databinding.FragmentCombinapiBinding;
+import com.yy.httputils.entity.api.SubjectPostApi;
+import com.yy.httputils.entity.resulte.BaseResultEntity;
+import com.yy.httputils.entity.resulte.SubjectResulte;
 import com.yy.httputils.model.GetDataModel;
 import com.yy.yhttputils.exception.ApiException;
+import com.yy.yhttputils.http.FragHttpManager;
 import com.yy.yhttputils.listener.HttpOnNextListener;
+
+import java.util.ArrayList;
 
 /**
  * <pre>
@@ -26,11 +36,16 @@ import com.yy.yhttputils.listener.HttpOnNextListener;
 public class CombinApiFragment extends RxFragment implements HttpOnNextListener{
 
     private GetDataModel getDataModel;
+    private FragHttpManager fragHttpManager;
+    //    post请求接口信息
+    private SubjectPostApi postEntity;
+
+
+    private FragmentCombinapiBinding binding;
 
     public CombinApiFragment() {
         super();
     }
-
 
     @Nullable
     @Override
@@ -43,14 +58,25 @@ public class CombinApiFragment extends RxFragment implements HttpOnNextListener{
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        getDataModel = new GetDataModel(getActivity(),this);
-
-        getDataModel.onClick();
+        binding = DataBindingUtil.bind(view);
+        postEntity = new SubjectPostApi();
+        postEntity.setAll(true);
+        fragHttpManager = new FragHttpManager(this,this);
+        fragHttpManager.doHttpDeal(postEntity);
+//        getDataModel = new GetDataModel(getActivity(),this);
+//        getDataModel.onClick();
     }
 
     @Override
     public void onNext(String resulte, String method) {
-        Log.e("CombinApiFragment",resulte);
+        Log.i("CombinApiFragment",resulte);
+        /*post返回处理*/
+        if (method.equals(postEntity.getMethod())) {
+            BaseResultEntity<ArrayList<SubjectResulte>> subjectResulte = JSONObject.parseObject(resulte, new
+                    TypeReference<BaseResultEntity<ArrayList<SubjectResulte>>>() {
+                    });
+            binding.text3.setText("post返回：\n" + subjectResulte.getData().toString());
+        }
     }
 
     @Override

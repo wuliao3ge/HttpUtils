@@ -2,6 +2,7 @@ package com.yy.httputils.activity;
 
 import android.Manifest;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
@@ -16,11 +17,13 @@ import com.bumptech.glide.Glide;
 import com.daimajia.numberprogressbar.NumberProgressBar;
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 import com.yy.httputils.R;
+import com.yy.httputils.databinding.ActivityMainBinding;
 import com.yy.httputils.entity.api.SubjectPostApi;
 import com.yy.httputils.entity.api.UploadApi;
 import com.yy.httputils.entity.resulte.BaseResultEntity;
 import com.yy.httputils.entity.resulte.SubjectResulte;
 import com.yy.httputils.entity.resulte.UploadResulte;
+import com.yy.httputils.model.DataViewModel;
 import com.yy.httputils.model.GetDataModel;
 import com.yy.yhttputils.downlaod.DownInfo;
 import com.yy.yhttputils.downlaod.DownState;
@@ -54,16 +57,14 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     private HttpManager manager;
 
     private HttpDownManager downloadManager;
-
     //    post请求接口信息
     private SubjectPostApi postEntity;
     //    上传接口信息
     private UploadApi uplaodApi;
 
-
-    private GetDataModel getDataModel ;
-
     private DownInfo apkApi;
+
+
 
 
     @Override
@@ -71,17 +72,19 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         requestPermissions();
+        manager = new HttpManager(this,this);
 
-         /*初始化数据*/
-        manager = HttpManager.getInstance()
-                .setContext(this)
-                .setLifecycle(this)
-                .setOnNextListener(this);
+
+//         /*初始化数据*/
+//        manager = HttpManager.getInstance()
+//                .setContext(this)
+//                .setLifecycle(this)
+//                .setOnNextListener(this);
 
         downloadManager = HttpDownManager.getInstance();
         tvMsg = (TextView) findViewById(R.id.tv_msg);
         findViewById(R.id.btn_rx).setOnClickListener(this);
-        findViewById(R.id.btn_rx_all).setOnClickListener(this);
+        findViewById(R.id.btn_rx_databinding).setOnClickListener(this);
         findViewById(R.id.btn_rx_mu_down).setOnClickListener(this);
         findViewById(R.id.btn_rx_uploade).setOnClickListener(this);
         findViewById(R.id.btn_rx_mu_fr).setOnClickListener(this);
@@ -90,11 +93,6 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
         progressBar = (NumberProgressBar) findViewById(R.id.number_progress_bar);
         postEntity = new SubjectPostApi();
         postEntity.setAll(true);
-        getDataModel = new GetDataModel(this,MainActivity.this);
-
-
-
-
 
         /*上传接口内部接口有token验证，所以需要换成自己的接口测试，检查file文件是否手机存在*/
         uplaodApi = new UploadApi();
@@ -154,22 +152,18 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btn_rx_all:
-//                Intent intentC = new Intent(this, CombinApiActivity.class);
-//                startActivity(intentC);
+            case R.id.btn_rx_databinding:
+                Intent intent = new Intent(this, DataBindActivity.class);
+                startActivity(intent);
                 break;
             case R.id.btn_rx:
-                /** 两种获取数据的方式 */
-//                manager.doHttpDeal(postEntity);
-                getDataModel.onClick();
+                manager.doHttpDeal(postEntity);
                 break;
             case R.id.btn_rx_uploade:
                 /** 上传数据 */
                 manager.doHttpDeal(uplaodApi);
                 break;
             case R.id.btn_rx_mu_down:
-
-
                 if(apkApi!=null)
                 {
                     if(apkApi.getState()==DownState.PAUSE)
@@ -188,12 +182,10 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                 }
                 break;
             case R.id.btn_rx_mu_down_pause:
-
                     if(apkApi!=null)
                     {
                         downloadManager.pause(apkApi);
                     }
-
                 break;
             case R.id.btn_rx_mu_fr:
                 /** fragment 中使用httpmanager */

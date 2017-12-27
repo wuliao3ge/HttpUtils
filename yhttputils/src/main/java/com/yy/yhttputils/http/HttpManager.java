@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.trello.rxlifecycle2.LifecycleProvider;
+import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 import com.yy.yhttputils.api.BaseApi;
 import com.yy.yhttputils.RxRetrofitApp;
 import com.yy.yhttputils.exception.RetryWhenNetworkException;
@@ -42,6 +43,18 @@ public class HttpManager {
         }
         return httpManager;
     }
+
+    @Deprecated
+    public HttpManager(HttpOnNextListener onNextListener, RxAppCompatActivity appCompatActivity) {
+        this.onNextListener = new SoftReference(onNextListener);
+        this.context = new SoftReference(appCompatActivity);
+        this.lifecycleProvider = new SoftReference<LifecycleProvider>(appCompatActivity);
+    }
+
+    public HttpManager(){
+
+    }
+
 
     /**
      * 生命周期管理句柄

@@ -23,7 +23,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+//import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 /**
  * Created by ly on 2017/12/26.
@@ -52,7 +53,11 @@ public class FragHttpManager {
             builder.addInterceptor(this.getHttpLoggingInterceptor());
         }
 
-        Retrofit retrofit = (new retrofit2.Retrofit.Builder()).client(builder.build()).addConverterFactory(ScalarsConverterFactory.create()).addCallAdapterFactory(RxJava2CallAdapterFactory.create()).baseUrl(baseUrl).build();
+        Retrofit retrofit = (new retrofit2.Retrofit.Builder()).client(builder.build())
+//                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .baseUrl(baseUrl).build();
         return retrofit;
     }
     public void httpDeal(Observable observable, BaseApi basePar) {

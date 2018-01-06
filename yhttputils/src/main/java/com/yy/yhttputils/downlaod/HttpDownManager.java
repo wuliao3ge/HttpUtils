@@ -25,7 +25,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+//import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 import static com.yy.yhttputils.utils.AppUtil.getBasUrl;
 
@@ -92,7 +93,8 @@ public class HttpDownManager {
 
             Retrofit retrofit = new Retrofit.Builder()
                     .client(builder.build())
-                    .addConverterFactory(ScalarsConverterFactory.create())
+//                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .baseUrl(getBasUrl(info.getUrl()))
                     .build();

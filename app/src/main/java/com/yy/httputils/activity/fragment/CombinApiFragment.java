@@ -9,8 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
+//import com.alibaba.fastjson.JSONObject;
+//import com.alibaba.fastjson.TypeReference;
+import com.google.gson.Gson;
 import com.trello.rxlifecycle2.components.support.RxFragment;
 import com.yy.httputils.R;
 import com.yy.httputils.databinding.FragmentCombinapiBinding;
@@ -72,9 +73,11 @@ public class CombinApiFragment extends RxFragment implements HttpOnNextListener{
         Log.i("CombinApiFragment",resulte);
         /*post返回处理*/
         if (method.equals(postEntity.getMethod())) {
-            BaseResultEntity<ArrayList<SubjectResulte>> subjectResulte = JSONObject.parseObject(resulte, new
-                    TypeReference<BaseResultEntity<ArrayList<SubjectResulte>>>() {
-                    });
+//            BaseResultEntity<ArrayList<SubjectResulte>> subjectResulte = JSONObject.parseObject(resulte, new
+//                    TypeReference<BaseResultEntity<ArrayList<SubjectResulte>>>() {
+//                    });
+            Gson gson = new Gson();
+            BaseResultEntity<ArrayList<SubjectResulte>> subjectResulte = gson.fromJson(resulte,BaseResultEntity.class);
             binding.text3.setText("post返回：\n" + subjectResulte.getData().toString());
         }
     }

@@ -3,8 +3,9 @@ package com.yy.httputils.model;
 import android.content.Context;
 import android.util.Log;
 
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
+//import com.alibaba.fastjson.JSONObject;
+//import com.alibaba.fastjson.TypeReference;
+import com.google.gson.Gson;
 import com.trello.rxlifecycle2.LifecycleProvider;
 import com.yy.httputils.AppApplication;
 import com.yy.httputils.entity.api.SubjectPostApi;
@@ -51,9 +52,11 @@ public class GetDataModel {
                     @Override
                     public void onNext(String resulte, String method) {
                         Log.i("自定义回调","onNext");
-                        BaseResultEntity<ArrayList<SubjectResulte>> subjectResulte = JSONObject.parseObject(resulte, new
-                                TypeReference<BaseResultEntity<ArrayList<SubjectResulte>>>() {
-                                });
+//                        BaseResultEntity<ArrayList<SubjectResulte>> subjectResulte = JSONObject.parseObject(resulte, new
+//                                TypeReference<BaseResultEntity<ArrayList<SubjectResulte>>>() {
+//                                });
+                        Gson gson = new Gson();
+                        BaseResultEntity<ArrayList<SubjectResulte>> subjectResulte = gson.fromJson(resulte,BaseResultEntity.class);
                         baseLoadListener.loadSuccess(subjectResulte.getData().toString());
                     }
 

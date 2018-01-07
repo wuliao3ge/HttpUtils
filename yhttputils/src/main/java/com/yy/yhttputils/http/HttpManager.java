@@ -24,6 +24,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 //import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 /**
@@ -115,11 +116,11 @@ public class HttpManager {
 
         /*创建retrofit对象*/
         final Retrofit retrofit = new Retrofit.Builder()
-                .client(builder.build())
-//                .addConverterFactory(ScalarsConverterFactory.create())
+                .baseUrl(baseUrl)
+                .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .baseUrl(baseUrl)
+                .client(builder.build())
                 .build();
         return retrofit;
     }

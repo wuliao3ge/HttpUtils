@@ -10,19 +10,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
 import com.blankj.utilcode.util.LogUtils;
 import com.bumptech.glide.Glide;
 import com.daimajia.numberprogressbar.NumberProgressBar;
+import com.google.gson.Gson;
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 import com.yy.httputils.R;
 import com.yy.httputils.databinding.ActivityMainBinding;
+import com.yy.httputils.entity.api.BodyPostApi;
 import com.yy.httputils.entity.api.SubjectPostApi;
 import com.yy.httputils.entity.api.UploadApi;
 import com.yy.httputils.entity.resulte.BaseResultEntity;
 import com.yy.httputils.entity.resulte.SubjectResulte;
 import com.yy.httputils.entity.resulte.UploadResulte;
+import com.yy.httputils.model.ApiModel;
 import com.yy.httputils.model.DataViewModel;
 import com.yy.httputils.model.GetDataModel;
 import com.yy.yhttputils.downlaod.DownInfo;
@@ -64,6 +65,8 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
 
     private DownInfo apkApi;
 
+
+    private BodyPostApi bodyPostApi;
 
 
 
@@ -117,6 +120,10 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                     }
                 }));
         uplaodApi.setPart(part);
+
+
+        bodyPostApi = new BodyPostApi();
+
     }
 
 
@@ -158,6 +165,13 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                 break;
             case R.id.btn_rx:
                 manager.doHttpDeal(postEntity);
+//                ApiModel apiModel = new ApiModel();
+//                apiModel.setToken("1234");
+//
+//                bodyPostApi.setApiModel(apiModel);
+//
+//                manager.doHttpDeal(bodyPostApi);
+
                 break;
             case R.id.btn_rx_uploade:
                 /** 上传数据 */
@@ -253,17 +267,23 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
 
         /*post返回处理*/
         if (mothead.equals(postEntity.getMethod())) {
-            BaseResultEntity<ArrayList<SubjectResulte>> subjectResulte = JSONObject.parseObject(resulte, new
-                    TypeReference<BaseResultEntity<ArrayList<SubjectResulte>>>() {
-                    });
+//            BaseResultEntity<ArrayList<SubjectResulte>> subjectResulte = JSONObject.parseObject(resulte, new
+//                    TypeReference<BaseResultEntity<ArrayList<SubjectResulte>>>() {
+//                    });
+            Gson gson = new Gson();
+            BaseResultEntity<ArrayList<SubjectResulte>> subjectResulte = gson.fromJson(resulte,BaseResultEntity.class);
+
             tvMsg.setText("post返回：\n" + subjectResulte.getData().toString());
         }
 
         /*上传返回处理*/
         if (mothead.equals(uplaodApi.getMethod())) {
-            BaseResultEntity<UploadResulte> subjectResulte = JSONObject.parseObject(resulte, new
-                    TypeReference<BaseResultEntity<UploadResulte>>() {
-                    });
+//            BaseResultEntity<UploadResulte> subjectResulte = JSONObject.parseObject(resulte, new
+//                    TypeReference<BaseResultEntity<UploadResulte>>() {
+//                    });
+            Gson gson = new Gson();
+            BaseResultEntity<UploadResulte> subjectResulte = gson.fromJson(resulte,BaseResultEntity.class);
+
             UploadResulte uploadResulte = subjectResulte.getData();
             tvMsg.setText("上传成功返回：\n" + uploadResulte.getHeadImgUrl());
             Glide.with(MainActivity.this).load(uploadResulte.getHeadImgUrl()).skipMemoryCache(true).into(img);

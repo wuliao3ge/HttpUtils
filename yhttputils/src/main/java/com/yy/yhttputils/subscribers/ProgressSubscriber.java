@@ -252,7 +252,7 @@ public class ProgressSubscriber<T> implements Observer<T> {
 //                CookieDbUtil.getInstance().updateCookie(resulte);
 //            }
 //        }
-        if (mSubscriberOnNextListener != null) {
+        if (mSubscriberOnNextListener != null&&mSubscriberOnNextListener.get()!=null) {
             mSubscriberOnNextListener.get().onNext((String) t, api.getMethod());
         }
     }

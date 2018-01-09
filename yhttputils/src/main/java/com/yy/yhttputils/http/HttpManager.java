@@ -149,9 +149,11 @@ public class HttpManager {
                     .observeOn(AndroidSchedulers.mainThread());
 
         /*数据String回调*/
-            if (onNextListener != null) {
+            if (onNextListener != null&&onNextListener.get()!=null) {
                 ProgressSubscriber subscriber = new ProgressSubscriber(basePar, onNextListener, context);
                 observable.subscribe(subscriber);
+            }else{
+
             }
     }
 

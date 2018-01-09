@@ -254,7 +254,7 @@ public class FragProgressSubscriber<T> implements Observer<T> {
 //                CookieDbUtil.getInstance().updateCookie(resulte);
 //            }
 //        }
-        if (mSubscriberOnNextListener.get() != null) {
+        if (mSubscriberOnNextListener!=null&&mSubscriberOnNextListener.get() != null) {
             mSubscriberOnNextListener.get().onNext((String) t, api.getMethod());
         }
     }

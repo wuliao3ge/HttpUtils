@@ -24,6 +24,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 //import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 /**
@@ -54,7 +55,7 @@ public class FragHttpManager {
         }
 
         Retrofit retrofit = (new retrofit2.Retrofit.Builder()).client(builder.build())
-//                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .baseUrl(baseUrl).build();
@@ -62,11 +63,11 @@ public class FragHttpManager {
     }
     public void httpDeal(Observable observable, BaseApi basePar) {
         observable = observable.retryWhen(new RetryWhenNetworkException(basePar.getRetryCount(), basePar.getRetryDelay(), basePar.getRetryIncreaseDelay())).onErrorResumeNext(new ExceptionFunc()).compose(((RxFragment)this.rxfraggment.get()).bindToLifecycle()).map(new ResulteFunc()).subscribeOn(Schedulers.io()).unsubscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
-
         if(this.onNextListener != null && null != this.onNextListener.get()) {
             FragProgressSubscriber subscriber = new FragProgressSubscriber(basePar, this.onNextListener, this.rxfraggment);
             observable.subscribe(subscriber);
         }
+
     }
 
     private HttpLoggingInterceptor getHttpLoggingInterceptor() {

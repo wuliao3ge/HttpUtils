@@ -44,6 +44,13 @@ public class FragHttpManager {
     @Deprecated
     public void doHttpDeal(BaseApi basePar) {
         Retrofit retrofit = this.getReTrofit(basePar.getConnectionTime(), basePar.getBaseUrl());
+        if(onNextListener==null&&onNextListener.get()==null)
+        {
+            try {
+                Thread.sleep (1000) ;
+            } catch (InterruptedException ie){
+            }
+        }
         this.httpDeal(basePar.getObservable(retrofit), basePar);
     }
 

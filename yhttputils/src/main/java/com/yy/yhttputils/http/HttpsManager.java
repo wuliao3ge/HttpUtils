@@ -7,11 +7,13 @@ import com.trello.rxlifecycle2.LifecycleProvider;
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 import com.yy.yhttputils.RxRetrofitApp;
 import com.yy.yhttputils.api.BaseApi;
+import com.yy.yhttputils.base.BaseProgress;
 import com.yy.yhttputils.exception.RetryWhenNetworkException;
 import com.yy.yhttputils.http.func.ExceptionFunc;
 import com.yy.yhttputils.http.func.ResulteFunc;
 import com.yy.yhttputils.listener.HttpOnNextListener;
 import com.yy.yhttputils.subscribers.ProgressSubscriber;
+import com.yy.yhttputils.utils.MCach;
 import com.yy.yhttputils.utils.StringUtil;
 
 import java.io.IOException;
@@ -23,9 +25,12 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -34,13 +39,15 @@ import javax.net.ssl.X509TrustManager;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.Cookie;
+import okhttp3.CookieJar;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
-//import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 /**
  * http交互处理类
@@ -55,6 +62,9 @@ public class HttpsManager {
     private static HttpsManager httpManager;
     private InputStream certificates;
     private OkHttpClient.Builder builder;
+    private static BaseProgress baseProgress = null;
+    private String cerName;
+
     public static HttpsManager getInstance(){
         if(httpManager ==null)
         {
@@ -106,18 +116,71 @@ public class HttpsManager {
         return this;
     }
 
+    public HttpsManager setBaseProgress(BaseProgress baseProgress) {
+        this.baseProgress = baseProgress;
+        return this;
+    }
+
+    public static BaseProgress getBaseProgress() {
+        return baseProgress;
+    }
 
     /**
      * 设置证书
-     * @param context 全局变量
      * @param cerName 证书名称
      * @return
      */
-    public HttpsManager setCer(Context context,String cerName){
+    public HttpsManager setCer(String cerName){
+        this.cerName = cerName;
+        return this;
+    }
+
+
+
+
+    /**
+     * 处理http请求
+     *
+     * @param basePar 封装的请求数据
+     */
+    public void doHttpDeal(final BaseApi basePar) {
+        if (baseProgress!=null)
+        {
+            basePar.setProgress(baseProgress);
+        }
+        Retrofit retrofit = getReTrofit(basePar.getConnectionTime(), basePar.getBaseUrl());
+        if(onNextListener!=null&&onNextListener.get()!=null)
+        {
+            Log.i("httpsmanager", "onNext不为空");
+            httpDeal(basePar.getObservable(retrofit), basePar);
+        }else {
+            Log.i("httpsmanager", "onNext为空");
+            try {
+                Log.i("httpsmanager","延迟前");
+                Thread.sleep (1000) ;
+                Log.i("httpsmanager","延迟后");
+            } catch (InterruptedException e){
+                e.printStackTrace();
+            }
+            httpDeal(basePar.getObservable(retrofit), basePar);
+        }
+        Log.i("httpsmanager", "doHttpDeal");
+    }
+
+
+    /**
+     * 获取Retrofit对象
+     *
+     * @param connectTime
+     * @param baseUrl
+     * @return
+     */
+    public Retrofit getReTrofit(int connectTime, String baseUrl) {
+
         if(StringUtil.isNoEmpty(cerName))
         {
             try {
-                setCertificates(builder,context.getAssets().open(cerName));
+                setCertificates(builder,context.get().getAssets().open(cerName));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -130,33 +193,11 @@ public class HttpsManager {
                 ssfFactory = sc.getSocketFactory();
             } catch (Exception e) {
             }
-            builder.sslSocketFactory(ssfFactory);
+            builder.sslSocketFactory(ssfFactory)
+                    .hostnameVerifier(new TrustAllHostnameVerifier())
+                    .cookieJar(new MCookie());
         }
-        return httpManager;
-    }
 
-
-
-
-    /**
-     * 处理http请求
-     *
-     * @param basePar 封装的请求数据
-     */
-    public void doHttpDeal(final BaseApi basePar) {
-        Retrofit retrofit = getReTrofit(basePar.getConnectionTime(), basePar.getBaseUrl());
-        httpDeal(basePar.getObservable(retrofit), basePar);
-    }
-
-
-    /**
-     * 获取Retrofit对象
-     *
-     * @param connectTime
-     * @param baseUrl
-     * @return
-     */
-    public Retrofit getReTrofit(int connectTime, String baseUrl) {
         //手动创建一个OkHttpClient并设置超时时间缓存等设置
         builder.connectTimeout(connectTime, TimeUnit.SECONDS);
         if (RxRetrofitApp.isDebug()) {
@@ -181,7 +222,8 @@ public class HttpsManager {
      * @param basePar
      */
     public void httpDeal(Observable observable, BaseApi basePar) {
-            observable = observable.retryWhen(new RetryWhenNetworkException(basePar.getRetryCount(),
+        Log.i("httpDeal","进入");
+        observable = observable.retryWhen(new RetryWhenNetworkException(basePar.getRetryCount(),
                     basePar.getRetryDelay(), basePar.getRetryIncreaseDelay()))
                 /*异常处理*/
                     .onErrorResumeNext(new ExceptionFunc())
@@ -201,8 +243,18 @@ public class HttpsManager {
             if (onNextListener != null&&onNextListener.get()!=null) {
                 ProgressSubscriber subscriber = new ProgressSubscriber(basePar, onNextListener, context);
                 observable.subscribe(subscriber);
-            }else{
-
+            }else {
+                for (int i = 10; i >= 0; i--) {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if (onNextListener != null && onNextListener.get() != null) {
+                        ProgressSubscriber subscriber = new ProgressSubscriber(basePar, onNextListener, context);
+                        observable.subscribe(subscriber);
+                    }
+                }
             }
     }
 
@@ -264,9 +316,24 @@ public void setCertificates(OkHttpClient.Builder clientBuilder, InputStream... c
         }
     }
 
+    public class TrustAllHostnameVerifier implements HostnameVerifier {
+        @Override
+        public boolean verify(String s, SSLSession sslSession) {
+            return true;
+        }
+    }
 
+    public class MCookie implements CookieJar {
+        @Override
+        public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
+            MCach.saveCookies(cookies);
+        }
 
-    
+        @Override
+        public List<Cookie> loadForRequest(HttpUrl url) {
+            return MCach.getCookies();
+        }
+    }
 
 
     /**

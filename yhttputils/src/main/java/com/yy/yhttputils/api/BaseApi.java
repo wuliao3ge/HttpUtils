@@ -38,7 +38,7 @@ public abstract class BaseApi {
     /**
      * 自定义对话框
      */
-    private BaseProgress progress;
+    private BaseProgress progress ;
     /**
      * 提示消息
      */

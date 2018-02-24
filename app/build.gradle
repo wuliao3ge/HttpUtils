@@ -34,7 +34,7 @@ dependencies {
     compile 'com.github.bumptech.glide:glide:3.6.1'
     compile 'com.jude:easyrecyclerview:4.2.6'
     compile 'com.android.support:recyclerview-v7:26.+'
-//    compile 'com.alibaba:fastjson:latest.integration'
+    //    compile 'com.alibaba:fastjson:latest.integration'
     compile 'com.google.code.gson:gson:2.8.1'
     testCompile 'junit:junit:4.12'
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'

@@ -7,6 +7,7 @@ import com.trello.rxlifecycle2.LifecycleProvider;
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 import com.yy.yhttputils.api.BaseApi;
 import com.yy.yhttputils.RxRetrofitApp;
+import com.yy.yhttputils.base.BaseProgress;
 import com.yy.yhttputils.exception.RetryWhenNetworkException;
 import com.yy.yhttputils.http.func.ExceptionFunc;
 import com.yy.yhttputils.http.func.ResulteFunc;
@@ -38,6 +39,9 @@ public class HttpManager {
     private SoftReference<Context> context;
     private SoftReference<LifecycleProvider> lifecycleProvider;
     private static HttpManager httpManager;
+
+    private static BaseProgress baseProgress = null;
+
     public static HttpManager getInstance(){
         if(httpManager ==null)
         {
@@ -88,13 +92,34 @@ public class HttpManager {
         return this;
     }
 
+    public HttpManager setBaseProgress(BaseProgress baseProgress) {
+        this.baseProgress = baseProgress;
+        return this;
+    }
+
+    public static BaseProgress getBaseProgress() {
+        return baseProgress;
+    }
+
+
     /**
      * 处理http请求
      *
      * @param basePar 封装的请求数据
      */
     public void doHttpDeal(final BaseApi basePar) {
+        if (baseProgress!=null)
+        {
+            basePar.setProgress(baseProgress);
+        }
         Retrofit retrofit = getReTrofit(basePar.getConnectionTime(), basePar.getBaseUrl());
+        if(onNextListener==null&&onNextListener.get()==null)
+        {
+            try {
+                Thread.sleep (1000) ;
+            } catch (InterruptedException ie){
+            }
+        }
         httpDeal(basePar.getObservable(retrofit), basePar);
     }
 

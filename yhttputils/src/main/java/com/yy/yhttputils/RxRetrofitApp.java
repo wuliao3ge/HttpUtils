@@ -2,6 +2,8 @@ package com.yy.yhttputils;
 
 import android.app.Application;
 
+import com.yy.yhttputils.base.BaseProgress;
+
 /**
  * 全局设定
  * Created by ly on 17-7-25.
@@ -56,6 +58,8 @@ public class RxRetrofitApp {
         BaseUrl = baseUrl;
         return rxRetrofitApp;
     }
+
+
 
     public RxRetrofitApp setDownConnectonTime(int downConnectonTime) {
         this.downConnectonTime = downConnectonTime;

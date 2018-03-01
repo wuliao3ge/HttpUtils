@@ -4,6 +4,8 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import com.yy.httputils.BR;
 import com.yy.httputils.framework.BaseLoadListener;
+import com.yy.httputils.model.datamodel.GetDataModel;
+import com.yy.yhttputils.base.HttpBaseModel;
 
 import java.util.List;
 
@@ -11,29 +13,26 @@ import java.util.List;
  * Created by ly on 2017/12/26.
  */
 
-public class DataViewModel extends BaseObservable implements BaseLoadListener<String>{
+public class DataViewModel<T extends HttpBaseModel> extends BaseObservable implements BaseLoadListener<String>{
     private String data;
-    private GetDataModel getDataModel;
+    private T getDataModel;
 
-    public DataViewModel(GetDataModel getDataModel) {
-        this.getDataModel = getDataModel;
-        getDataModel.setBaseLoadListener(this);
+    public DataViewModel() {
+        ((GetDataModel)getDataModel).setBaseLoadListener(this);
 //        getDataModel.setDataViewModel(this);
     }
 
     public void onClick(){
-        getDataModel.getData();
+        ((GetDataModel)getDataModel).getData();
     }
-    public GetDataModel getGetDataModel() {
+
+    public T getGetDataModel() {
         return getDataModel;
     }
 
-    public void setGetDataModel(GetDataModel getDataModel) {
+    public void setGetDataModel(T getDataModel) {
         this.getDataModel = getDataModel;
     }
-
-
-
 
     @Bindable
     public String getData() {

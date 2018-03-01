@@ -14,7 +14,7 @@ import com.trello.rxlifecycle2.components.support.RxFragment;
  * </pre>
  */
 
-public abstract class RxBaseFragment extends RxFragment {
+public abstract class HttpBaseFragment extends RxFragment {
 
 
     private boolean isPrepared;
@@ -32,7 +32,7 @@ public abstract class RxBaseFragment extends RxFragment {
     }
 
 
-    public RxBaseFragment() {
+    public HttpBaseFragment() {
         super();
         mContext = getActivity();
     }

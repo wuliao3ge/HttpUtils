@@ -18,7 +18,7 @@ import com.yy.httputils.databinding.FragmentCombinapiBinding;
 import com.yy.httputils.entity.api.SubjectPostApi;
 import com.yy.httputils.entity.resulte.BaseResultEntity;
 import com.yy.httputils.entity.resulte.SubjectResulte;
-import com.yy.httputils.model.GetDataModel;
+import com.yy.httputils.model.datamodel.GetDataModel;
 import com.yy.yhttputils.exception.ApiException;
 import com.yy.yhttputils.http.FragHttpManager;
 import com.yy.yhttputils.listener.HttpOnNextListener;

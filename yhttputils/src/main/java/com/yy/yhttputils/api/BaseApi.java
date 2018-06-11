@@ -33,6 +33,10 @@ public abstract class BaseApi {
     private long retryDelay = 100;
     /*retry叠加延迟*/
     private long retryIncreaseDelay = 100;
+
+
+
+
 //    /*缓存url-可手动设置*/
 //    private String cacheUrl;
     /**

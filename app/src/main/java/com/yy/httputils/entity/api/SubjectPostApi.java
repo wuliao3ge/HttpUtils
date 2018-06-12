@@ -1,6 +1,9 @@
 package com.yy.httputils.entity.api;
 
 
+import android.util.Log;
+
+import com.blankj.utilcode.util.LogUtils;
 import com.yy.httputils.HttpPostService;
 import com.yy.yhttputils.api.BaseApi;
 
@@ -41,6 +44,7 @@ public class SubjectPostApi extends BaseApi {
 
     @Override
     public Observable getObservable(Retrofit retrofit) {
+        LogUtils.i("getObservable");
         HttpPostService httpService = retrofit.create(HttpPostService.class);
         return httpService.getAllVedioBy(isAll());
     }

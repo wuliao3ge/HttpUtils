@@ -13,25 +13,20 @@ import java.util.List;
  * Created by ly on 2017/12/26.
  */
 
-public class DataViewModel<T extends HttpBaseModel> extends BaseObservable implements BaseLoadListener<String>{
+public class DataViewModel extends BaseObservable implements BaseLoadListener<String>{
     private String data;
-    private T getDataModel;
+//    private T getDataModel;
+    private GetDataModel getDataModel;
 
-    public DataViewModel() {
-        ((GetDataModel)getDataModel).setBaseLoadListener(this);
+    public DataViewModel(GetDataModel getDataModel) {
+        this.getDataModel = getDataModel;
+        getDataModel.setBaseLoadListener(this);
+//        ((GetDataModel)getDataModel).setBaseLoadListener(this);
 //        getDataModel.setDataViewModel(this);
     }
 
     public void onClick(){
-        ((GetDataModel)getDataModel).getData();
-    }
-
-    public T getGetDataModel() {
-        return getDataModel;
-    }
-
-    public void setGetDataModel(T getDataModel) {
-        this.getDataModel = getDataModel;
+        getDataModel.getData();
     }
 
     @Bindable

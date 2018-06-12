@@ -24,8 +24,10 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HostnameVerifier;
@@ -55,15 +57,14 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
  */
 public class HttpsManager {
     /*软引用對象*/
-    private SoftReference<HttpOnNextListener> onNextListener;
+    private List<HttpOnNextListener> listenerList = new ArrayList<>();
 //    private HttpOnNextListener onNextListener;
-    private SoftReference<Context> context;
-    private SoftReference<LifecycleProvider> lifecycleProvider;
     private static HttpsManager httpManager;
-    private InputStream certificates;
+//    private InputStream certificates;
     private OkHttpClient.Builder builder;
     private static BaseProgress baseProgress = null;
     private String cerName;
+    private InputStream[] inputStreams;
 
     public static HttpsManager getInstance(){
         if(httpManager ==null)
@@ -73,38 +74,14 @@ public class HttpsManager {
         return httpManager;
     }
 
-    @Deprecated
-    public HttpsManager(HttpOnNextListener onNextListener, RxAppCompatActivity appCompatActivity) {
-        this.onNextListener = new SoftReference(onNextListener);
-        this.context = new SoftReference(appCompatActivity);
-        this.lifecycleProvider = new SoftReference<LifecycleProvider>(appCompatActivity);
-        builder = new OkHttpClient.Builder();
-    }
-
     public HttpsManager(){
         builder = new OkHttpClient.Builder();
     }
 
 
-    /**
-     * 生命周期管理句柄
-     * @param lifecycleProvider
-     * @return
-     */
-    public HttpsManager setLifecycle(LifecycleProvider lifecycleProvider) {
-        this.lifecycleProvider =  new SoftReference<>(lifecycleProvider);
-        return this;
-    }
 
-    /**
-     * 用于对话框显示的句柄
-     * @param context
-     * @return
-     */
-    public HttpsManager setContext(Context context) {
-        this.context = new SoftReference(context);
-        return this;
-    }
+
+
 
     /**
      * 返回数据监听
@@ -112,7 +89,8 @@ public class HttpsManager {
      * @return
      */
     public HttpsManager setOnNextListener(HttpOnNextListener onNextListener){
-        this.onNextListener = new SoftReference<>(onNextListener);
+        listenerList.clear();
+        listenerList.add(onNextListener);
         return this;
     }
 
@@ -127,11 +105,11 @@ public class HttpsManager {
 
     /**
      * 设置证书
-     * @param cerName 证书名称
+     * @param certificates 证书流
      * @return
      */
-    public HttpsManager setCer(String cerName){
-        this.cerName = cerName;
+    public HttpsManager setCer(InputStream... certificates){
+        this.inputStreams = certificates;
         return this;
     }
 
@@ -144,27 +122,12 @@ public class HttpsManager {
      * @param basePar 封装的请求数据
      */
     public void doHttpDeal(final BaseApi basePar) {
-        if (baseProgress!=null)
-        {
-            basePar.setProgress(baseProgress);
-        }
         Retrofit retrofit = getReTrofit(basePar.getConnectionTime(), basePar.getBaseUrl());
-        if(onNextListener!=null&&onNextListener.get()!=null)
+        if(listenerList!=null&&listenerList.size()>0)
         {
             Log.i("httpsmanager", "onNext不为空");
             httpDeal(basePar.getObservable(retrofit), basePar);
-        }else {
-            Log.i("httpsmanager", "onNext为空");
-            try {
-                Log.i("httpsmanager","延迟前");
-                Thread.sleep (1000) ;
-                Log.i("httpsmanager","延迟后");
-            } catch (InterruptedException e){
-                e.printStackTrace();
-            }
-            httpDeal(basePar.getObservable(retrofit), basePar);
         }
-        Log.i("httpsmanager", "doHttpDeal");
     }
 
 
@@ -179,11 +142,7 @@ public class HttpsManager {
 
         if(StringUtil.isNoEmpty(cerName))
         {
-            try {
-                setCertificates(builder,context.get().getAssets().open(cerName));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            setCertificates(builder,inputStreams);
         }else{
             SSLSocketFactory ssfFactory = null;
             try {
@@ -228,7 +187,7 @@ public class HttpsManager {
                 /*异常处理*/
                     .onErrorResumeNext(new ExceptionFunc())
                 /*生命周期管理*/
-                    .compose(lifecycleProvider.get().bindToLifecycle())
+//                    .compose(lifecycleProvider.get().bindToLifecycle())
                     //Note:手动设置在activity onDestroy的时候取消订阅
 //                .compose(appCompatActivity.get().bindUntilEvent(ActivityEvent.DESTROY))
                 /*返回数据统一判断*/
@@ -240,21 +199,9 @@ public class HttpsManager {
                     .observeOn(AndroidSchedulers.mainThread());
 
         /*数据String回调*/
-            if (onNextListener != null&&onNextListener.get()!=null) {
-                ProgressSubscriber subscriber = new ProgressSubscriber(basePar, onNextListener, context);
+            if (listenerList != null&&listenerList.size()>0) {
+                ProgressSubscriber subscriber = new ProgressSubscriber(basePar, listenerList.get(0));
                 observable.subscribe(subscriber);
-            }else {
-                for (int i = 10; i >= 0; i--) {
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    if (onNextListener != null && onNextListener.get() != null) {
-                        ProgressSubscriber subscriber = new ProgressSubscriber(basePar, onNextListener, context);
-                        observable.subscribe(subscriber);
-                    }
-                }
             }
     }
 

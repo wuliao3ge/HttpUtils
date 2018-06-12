@@ -13,6 +13,7 @@ import com.blankj.utilcode.util.LogUtils;
 import com.bumptech.glide.Glide;
 import com.daimajia.numberprogressbar.NumberProgressBar;
 import com.google.gson.Gson;
+import com.squareup.haha.perflib.Main;
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 import com.yy.httputils.R;
 import com.yy.httputils.entity.api.BodyPostApi;
@@ -26,6 +27,7 @@ import com.yy.yhttputils.downlaod.DownState;
 import com.yy.yhttputils.downlaod.HttpDownManager;
 import com.yy.yhttputils.exception.ApiException;
 import com.yy.yhttputils.http.HttpManager;
+import com.yy.yhttputils.http.HttpsManager;
 import com.yy.yhttputils.listener.HttpDownOnNextListener;
 import com.yy.yhttputils.listener.HttpOnNextListener;
 
@@ -50,7 +52,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     private NumberProgressBar progressBar;
     private ImageView img;
     //    公用一个HttpManager
-    private HttpManager manager;
+//    private HttpsManager manager;
 
     private HttpDownManager downloadManager;
     //    post请求接口信息
@@ -70,7 +72,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         requestPermissions();
-        manager = new HttpManager(this,this);
+//        manager = new HttpsManager();
 
 
 //         /*初始化数据*/
@@ -159,18 +161,14 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                 startActivity(intent);
                 break;
             case R.id.btn_rx:
-                manager.doHttpDeal(postEntity);
-//                ApiModel apiModel = new ApiModel();
-//                apiModel.setToken("1234");
-//
-//                bodyPostApi.setApiModel(apiModel);
-//
-//                manager.doHttpDeal(bodyPostApi);
-
+//                manager.setOnNextListener(MainActivity.this);
+//                manager.doHttpDeal(postEntity);
+                HttpsManager.getInstance().setOnNextListener(MainActivity.this)
+                        .doHttpDeal(postEntity);
                 break;
             case R.id.btn_rx_uploade:
                 /** 上传数据 */
-                manager.doHttpDeal(uplaodApi);
+//                manager.doHttpDeal(uplaodApi);
                 break;
             case R.id.btn_rx_mu_down:
                 if(apkApi!=null)

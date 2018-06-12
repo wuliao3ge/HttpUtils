@@ -175,7 +175,7 @@ public class HttpManager {
 
         /*数据String回调*/
             if (onNextListener != null&&onNextListener.get()!=null) {
-                ProgressSubscriber subscriber = new ProgressSubscriber(basePar, onNextListener, context);
+                ProgressSubscriber subscriber = new ProgressSubscriber(basePar, onNextListener.get());
                 observable.subscribe(subscriber);
             }else{
 

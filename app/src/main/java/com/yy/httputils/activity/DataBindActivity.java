@@ -15,14 +15,19 @@ public class DataBindActivity extends HttpBaseActivity<GetDataModel> {
     private ActivityDataBindBinding binding;
 
     private DataViewModel dataViewModel;
-
+    private GetDataModel getDataModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this,R.layout.activity_data_bind);
-        dataViewModel = new DataViewModel();
-        dataViewModel.setGetDataModel(dataModel);
+        getDataModel = new GetDataModel();
+        dataViewModel = new DataViewModel(getDataModel);
         binding.setModel(dataViewModel);
+
+
+
+
+
     }
 }

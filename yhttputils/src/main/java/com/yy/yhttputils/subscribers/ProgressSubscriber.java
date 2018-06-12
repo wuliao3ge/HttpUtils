@@ -31,9 +31,8 @@ public class ProgressSubscriber<T> implements Observer<T> {
     /*是否弹框*/
     private boolean showPorgress = true;
     //    回调接口
-    private SoftReference<HttpOnNextListener> mSubscriberOnNextListener;
-    //    软引用反正内存泄露
-    private SoftReference<Context> mActivity;
+    private HttpOnNextListener mSubscriberOnNextListener;
+
     //    加载框可自己定义
     private BaseProgress pd;
     /*请求数据*/
@@ -46,12 +45,10 @@ public class ProgressSubscriber<T> implements Observer<T> {
      *
      * @param api
      */
-    public ProgressSubscriber(BaseApi api,SoftReference<HttpOnNextListener>  listenerSoftReference, SoftReference<Context>
-            mActivity) {
+    public ProgressSubscriber(BaseApi api,HttpOnNextListener  listenerSoftReference) {
         this.api = api;
         this.pd = api.getProgress();
         this.mSubscriberOnNextListener = listenerSoftReference;
-        this.mActivity = mActivity;
         setShowPorgress(api.isShowProgress());
         if (api.isShowProgress()) {
             initProgressDialog(api.isCancel());
@@ -63,21 +60,21 @@ public class ProgressSubscriber<T> implements Observer<T> {
      * 初始化加载框
      */
     private void initProgressDialog(boolean cancel) {
-        Context context = mActivity.get();
-        if (pd == null && context != null) {
-            pd = new DefaultProgress(context);
-        }
-        pd.setProgressMessage(api.getProgressMassge());
-        pd.setCancelable(cancel);
-        if (cancel) {
-            pd.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                @Override
-                public void onCancel(DialogInterface dialogInterface) {
-                    onCancelProgress();
-                    pd.onCance();
-                }
-            });
-        }
+
+//        if (pd == null && context != null) {
+//            pd = new DefaultProgress(context);
+//        }
+//        pd.setProgressMessage(api.getProgressMassge());
+//        pd.setCancelable(cancel);
+//        if (cancel) {
+//            pd.setOnCancelListener(new DialogInterface.OnCancelListener() {
+//                @Override
+//                public void onCancel(DialogInterface dialogInterface) {
+//                    onCancelProgress();
+//                    pd.onCance();
+//                }
+//            });
+//        }
     }
 
 
@@ -85,12 +82,12 @@ public class ProgressSubscriber<T> implements Observer<T> {
      * 显示加载框
      */
     private void showProgressDialog() {
-        if (!isShowPorgress()) return;
-        Context context = mActivity.get();
-        if (pd == null || context == null) return;
-        if (!pd.isProgressShowing()) {
-            pd.progressShow();
-        }
+//        if (!isShowPorgress()) return;
+//        Context context = mActivity.get();
+//        if (pd == null || context == null) return;
+//        if (!pd.isProgressShowing()) {
+//            pd.progressShow();
+//        }
     }
 
 
@@ -98,10 +95,10 @@ public class ProgressSubscriber<T> implements Observer<T> {
      * 隐藏
      */
     private void dismissProgressDialog() {
-        if (!isShowPorgress()) return;
-        if (pd != null && pd.isProgressShowing()) {
-            pd.dismissProgress();
-        }
+//        if (!isShowPorgress()) return;
+//        if (pd != null && pd.isProgressShowing()) {
+//            pd.dismissProgress();
+//        }
     }
 
 
@@ -189,9 +186,7 @@ public class ProgressSubscriber<T> implements Observer<T> {
      * @param e
      */
     private void errorDo(Throwable e) {
-        Context context = mActivity.get();
-        if (context == null) return;
-        HttpOnNextListener httpOnNextListener = mSubscriberOnNextListener.get();
+        HttpOnNextListener httpOnNextListener = mSubscriberOnNextListener;
         if (httpOnNextListener == null) return;
         if (e instanceof ApiException) {
             httpOnNextListener.onError((ApiException) e,api.getMethod());
@@ -252,8 +247,8 @@ public class ProgressSubscriber<T> implements Observer<T> {
 //                CookieDbUtil.getInstance().updateCookie(resulte);
 //            }
 //        }
-        if (mSubscriberOnNextListener != null&&mSubscriberOnNextListener.get()!=null) {
-            mSubscriberOnNextListener.get().onNext((String) t, api.getMethod());
+        if (mSubscriberOnNextListener != null) {
+            mSubscriberOnNextListener.onNext((String) t, api.getMethod());
         }
     }
 

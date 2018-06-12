@@ -18,10 +18,7 @@ public class HttpBaseActivity<T extends HttpBaseModel> extends RxAppCompatActivi
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = this;
-        httpManager = new HttpManager()
-                .setContext(this)
-                .setLifecycle(this);
-        dataModel.setHttpManager(httpManager);
+
     }
 
 //    public <T extends HttpBaseModel> void initDataModel(T... arg){

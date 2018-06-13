@@ -1,46 +1,21 @@
 package com.yy.yhttputils.http;
 
-import android.content.Context;
-import android.util.Log;
-
-import com.trello.rxlifecycle2.LifecycleProvider;
-import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
-import com.yy.yhttputils.api.BaseApi;
 import com.yy.yhttputils.RxRetrofitApp;
+import com.yy.yhttputils.api.BaseApi;
 import com.yy.yhttputils.base.BaseProgress;
-import com.yy.yhttputils.exception.RetryWhenNetworkException;
-import com.yy.yhttputils.http.func.ExceptionFunc;
-import com.yy.yhttputils.http.func.ResulteFunc;
+import com.yy.yhttputils.enums.NetType;
+import com.yy.yhttputils.framework.HttpInterface;
 import com.yy.yhttputils.listener.HttpOnNextListener;
-import com.yy.yhttputils.subscribers.ProgressSubscriber;
 
-import java.lang.ref.SoftReference;
-import java.util.concurrent.TimeUnit;
-
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
-import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
-//import retrofit2.converter.scalars.ScalarsConverterFactory;
+import java.io.InputStream;
 
 /**
- * http交互处理类
- * Created by ly on 17-7-25.
+ * Created by ly on 2018/6/13.
  */
-public class HttpManager {
-    /*软引用對象*/
-    private SoftReference<HttpOnNextListener> onNextListener;
-//    private HttpOnNextListener onNextListener;
-    private SoftReference<Context> context;
-    private SoftReference<LifecycleProvider> lifecycleProvider;
-    private static HttpManager httpManager;
 
-    private static BaseProgress baseProgress = null;
+public class HttpManager {
+    private static HttpManager httpManager;
+    private HttpInterface httpTools;
 
     public static HttpManager getInstance(){
         if(httpManager ==null)
@@ -49,158 +24,60 @@ public class HttpManager {
         }
         return httpManager;
     }
-
-    @Deprecated
-    public HttpManager(HttpOnNextListener onNextListener, RxAppCompatActivity appCompatActivity) {
-        this.onNextListener = new SoftReference(onNextListener);
-        this.context = new SoftReference(appCompatActivity);
-        this.lifecycleProvider = new SoftReference<LifecycleProvider>(appCompatActivity);
-    }
-
     public HttpManager(){
-
+        if(RxRetrofitApp.getRxRetrofitApp().getNetType()== NetType.NETTYPE_HTTP)
+        {
+            httpTools = new HttpUtils();
+        }else{
+            httpTools = new HttpsUtils();
+        }
     }
 
 
     /**
-     * 生命周期管理句柄
-     * @param lifecycleProvider
-     * @return
-     */
-    public HttpManager setLifecycle(LifecycleProvider lifecycleProvider) {
-        this.lifecycleProvider =  new SoftReference<>(lifecycleProvider);
-        return this;
-    }
-
-    /**
-     * 用于对话框显示的句柄
-     * @param context
-     * @return
-     */
-    public HttpManager setContext(Context context) {
-        this.context = new SoftReference(context);
-        return this;
-    }
-
-    /**
-     * 返回数据监听
+     * 设置回调
      * @param onNextListener
      * @return
      */
-    public HttpManager setOnNextListener(HttpOnNextListener onNextListener){
-        this.onNextListener = new SoftReference<>(onNextListener);
-        return this;
-    }
-
-    public HttpManager setBaseProgress(BaseProgress baseProgress) {
-        this.baseProgress = baseProgress;
-        return this;
-    }
-
-    public static BaseProgress getBaseProgress() {
-        return baseProgress;
-    }
-
-
-    /**
-     * 处理http请求
-     *
-     * @param basePar 封装的请求数据
-     */
-    public void doHttpDeal(final BaseApi basePar) {
-        if (baseProgress!=null)
-        {
-            basePar.setProgress(baseProgress);
-        }
-        Retrofit retrofit = getReTrofit(basePar.getConnectionTime(), basePar.getBaseUrl());
-        if(onNextListener==null&&onNextListener.get()==null)
-        {
-            try {
-                Thread.sleep (1000) ;
-            } catch (InterruptedException ie){
-            }
-        }
-        httpDeal(basePar.getObservable(retrofit), basePar);
-    }
-
-
-    /**
-     * 获取Retrofit对象
-     *
-     * @param connectTime
-     * @param baseUrl
-     * @return
-     */
-    public Retrofit getReTrofit(int connectTime, String baseUrl) {
-        //手动创建一个OkHttpClient并设置超时时间缓存等设置
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.connectTimeout(connectTime, TimeUnit.SECONDS);
-        if (RxRetrofitApp.isDebug()) {
-            builder.addInterceptor(getHttpLoggingInterceptor());
-        }
-
-        /*创建retrofit对象*/
-        final Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(baseUrl)
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .client(builder.build())
-                .build();
-        return retrofit;
+    public HttpManager setOnNextListener(HttpOnNextListener onNextListener) {
+        httpTools.setOnNextListener(onNextListener);
+        return httpManager;
     }
 
     /**
-     * RxRetrofit处理
-     *
-     * @param observable
+     * 执行api
      * @param basePar
+     * @return
      */
-    public void httpDeal(Observable observable, BaseApi basePar) {
-            observable = observable.retryWhen(new RetryWhenNetworkException(basePar.getRetryCount(),
-                    basePar.getRetryDelay(), basePar.getRetryIncreaseDelay()))
-                /*异常处理*/
-                    .onErrorResumeNext(new ExceptionFunc())
-                /*生命周期管理*/
-                    .compose(lifecycleProvider.get().bindToLifecycle())
-                    //Note:手动设置在activity onDestroy的时候取消订阅
-//                .compose(appCompatActivity.get().bindUntilEvent(ActivityEvent.DESTROY))
-                /*返回数据统一判断*/
-                    .map(new ResulteFunc())
-                /*http请求线程*/
-                    .subscribeOn(Schedulers.io())
-                    .unsubscribeOn(Schedulers.io())
-                /*回调线程*/
-                    .observeOn(AndroidSchedulers.mainThread());
-
-        /*数据String回调*/
-            if (onNextListener != null&&onNextListener.get()!=null) {
-                ProgressSubscriber subscriber = new ProgressSubscriber(basePar, onNextListener.get());
-                observable.subscribe(subscriber);
-            }else{
-
-            }
+    public void doHttpDeal(BaseApi basePar) {
+        httpTools.doHttpDeal(basePar);
     }
 
     /**
-     * 日志输出
-     * 自行判定是否添加
-     *
+     * 设置对话框
+     * @param baseProgress
      * @return
      */
-    private HttpLoggingInterceptor getHttpLoggingInterceptor() {
-        //日志显示级别
-        HttpLoggingInterceptor.Level level = HttpLoggingInterceptor.Level.BODY;
-        //新建log拦截器
-        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
-            @Override
-            public void log(String message) {
-                if (RxRetrofitApp.isDebug()) {
-                    Log.d("RxRetrofit", "Retrofit====Message:" + message);
-                }
-            }
-        });
-        loggingInterceptor.setLevel(level);
-        return loggingInterceptor;
+    public HttpManager setBaseProgress(BaseProgress baseProgress) {
+        httpTools.setBaseProgress(baseProgress);
+        return httpManager;
     }
+
+
+    /**
+     * 设置证书流
+     * @param certificates
+     */
+    public void setCertificate(InputStream... certificates) {
+        httpTools.setCertificate(certificates);
+    }
+
+    public void release(){
+        httpTools.release();
+    }
+
+
+
+
+
 }

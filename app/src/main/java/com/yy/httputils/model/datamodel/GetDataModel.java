@@ -14,7 +14,7 @@ import com.yy.httputils.entity.resulte.SubjectResulte;
 import com.yy.httputils.framework.BaseLoadListener;
 import com.yy.yhttputils.base.HttpBaseModel;
 import com.yy.yhttputils.exception.ApiException;
-import com.yy.yhttputils.http.HttpsManager;
+import com.yy.yhttputils.http.HttpManager;
 import com.yy.yhttputils.listener.HttpOnNextListener;
 
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class GetDataModel extends HttpBaseModel{
     }
 
     public  void getData(){
-        HttpsManager.getInstance().setOnNextListener(new HttpOnNextListener() {
+        HttpManager.getInstance().setOnNextListener(new HttpOnNextListener() {
             @Override
             public void onNext(String resulte, String method) {
                 Gson gson = new Gson();

@@ -6,6 +6,7 @@ import com.blankj.utilcode.util.Utils;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 import com.yy.yhttputils.RxRetrofitApp;
+import com.yy.yhttputils.enums.NetType;
 import com.yy.yhttputils.http.HttpManager;
 
 /**
@@ -16,7 +17,6 @@ public class AppApplication extends Application {
 
     private static AppApplication appApplication;
 
-    private HttpManager httpManager;
 
     public static AppApplication getInstance(){
         if(appApplication ==null)
@@ -24,10 +24,6 @@ public class AppApplication extends Application {
             appApplication = new AppApplication();
         }
         return appApplication;
-    }
-
-    public AppApplication() {
-        httpManager = HttpManager.getInstance();
     }
 
 
@@ -39,7 +35,7 @@ public class AppApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-//        LeakCanary.install(this);
+        LeakCanary.install(this);
 //        RxRetrofitApp.init(this,"https://www.izaodao.com/Api/");
 
 
@@ -49,16 +45,20 @@ public class AppApplication extends Application {
         RxRetrofitApp.Create(this)
                 .setBaseUrl("https://www.izaodao.com/Api/")
                 .setDebug(true)
+                .setNetType(NetType.NETTYPE_HTTPS)
                 .setProgressMassge("请求数据中,请稍等……");
     }
 
-    public HttpManager getHttpManager() {
-        return httpManager;
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        RxRetrofitApp.getRxRetrofitApp().release();
     }
 
-
-    public static RefWatcher getRefWatcher() {
-        return getInstance().mRefWatcher;
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        RxRetrofitApp.getRxRetrofitApp().release();
     }
-
 }

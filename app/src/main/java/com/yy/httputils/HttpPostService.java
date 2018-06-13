@@ -7,6 +7,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
+import retrofit2.http.Url;
 
 /**
  * 测试接口service-post相关
@@ -22,4 +23,6 @@ public interface HttpPostService {
     @POST("AppFiftyToneGraph/videoLink/")
     Observable<String> getAllVedio(@Body ApiModel apiModel);
 
+    @GET
+    Observable<String> getHttps(@Url String url);
 }

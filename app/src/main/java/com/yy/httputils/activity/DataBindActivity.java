@@ -24,10 +24,5 @@ public class DataBindActivity extends HttpBaseActivity<GetDataModel> {
         getDataModel = new GetDataModel();
         dataViewModel = new DataViewModel(getDataModel);
         binding.setModel(dataViewModel);
-
-
-
-
-
     }
 }

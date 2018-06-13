@@ -111,11 +111,5 @@ public class DefaultSubscriber<T> implements Observer<T> {
         }else {
             Log.i("onNext","失败");
         }
-//        if (defaultHttpListener != null&&defaultHttpListener.get()!=null) {
-//            defaultHttpListener.get().onNext((String) t, api.getMethod());
-//            Log.i("onNext","成功");
-//        }else {
-//            Log.i("onNext","失败");
-//        }
     }
 }

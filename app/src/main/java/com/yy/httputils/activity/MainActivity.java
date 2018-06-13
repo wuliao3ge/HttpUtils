@@ -13,10 +13,10 @@ import com.blankj.utilcode.util.LogUtils;
 import com.bumptech.glide.Glide;
 import com.daimajia.numberprogressbar.NumberProgressBar;
 import com.google.gson.Gson;
-import com.squareup.haha.perflib.Main;
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 import com.yy.httputils.R;
 import com.yy.httputils.entity.api.BodyPostApi;
+import com.yy.httputils.entity.api.HttpsApi;
 import com.yy.httputils.entity.api.SubjectPostApi;
 import com.yy.httputils.entity.api.UploadApi;
 import com.yy.httputils.entity.resulte.BaseResultEntity;
@@ -27,7 +27,6 @@ import com.yy.yhttputils.downlaod.DownState;
 import com.yy.yhttputils.downlaod.HttpDownManager;
 import com.yy.yhttputils.exception.ApiException;
 import com.yy.yhttputils.http.HttpManager;
-import com.yy.yhttputils.http.HttpsManager;
 import com.yy.yhttputils.listener.HttpDownOnNextListener;
 import com.yy.yhttputils.listener.HttpOnNextListener;
 
@@ -62,6 +61,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
 
     private DownInfo apkApi;
 
+    private HttpsApi httpsApi;
 
     private BodyPostApi bodyPostApi;
 
@@ -163,7 +163,11 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
             case R.id.btn_rx:
 //                manager.setOnNextListener(MainActivity.this);
 //                manager.doHttpDeal(postEntity);
-                HttpsManager.getInstance().setOnNextListener(MainActivity.this)
+
+
+//                httpsApi = new HttpsApi();
+//                httpsApi.setUrl("https://www.baidu.com/");
+                HttpManager.getInstance().setOnNextListener(MainActivity.this)
                         .doHttpDeal(postEntity);
                 break;
             case R.id.btn_rx_uploade:
@@ -196,8 +200,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                 break;
             case R.id.btn_rx_mu_fr:
                 /** fragment 中使用httpmanager */
-                Intent intent1 = new Intent(this, FragmentHttpAcitivity.class);
-                startActivity(intent1);
+
                 break;
         }
     }

@@ -1,24 +1,20 @@
 package com.yy.yhttputils.http;
 
-import android.content.Context;
 import android.util.Log;
 
-import com.trello.rxlifecycle2.LifecycleProvider;
-import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 import com.yy.yhttputils.RxRetrofitApp;
 import com.yy.yhttputils.api.BaseApi;
 import com.yy.yhttputils.base.BaseProgress;
 import com.yy.yhttputils.exception.RetryWhenNetworkException;
+import com.yy.yhttputils.framework.HttpInterface;
 import com.yy.yhttputils.http.func.ExceptionFunc;
 import com.yy.yhttputils.http.func.ResulteFunc;
 import com.yy.yhttputils.listener.HttpOnNextListener;
 import com.yy.yhttputils.subscribers.ProgressSubscriber;
 import com.yy.yhttputils.utils.MCach;
-import com.yy.yhttputils.utils.StringUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.SoftReference;
 import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
@@ -27,7 +23,6 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HostnameVerifier;
@@ -45,62 +40,42 @@ import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 /**
- * http交互处理类
- * Created by ly on 17-7-25.
+ * Created by ly on 2018/6/13.
  */
-public class HttpsManager {
-    /*软引用對象*/
-    private List<HttpOnNextListener> listenerList = new ArrayList<>();
-//    private HttpOnNextListener onNextListener;
-    private static HttpsManager httpManager;
-//    private InputStream certificates;
-    private OkHttpClient.Builder builder;
+
+public class HttpsUtils implements HttpInterface {
+
+
+
+
     private static BaseProgress baseProgress = null;
-    private String cerName;
     private InputStream[] inputStreams;
 
-    public static HttpsManager getInstance(){
-        if(httpManager ==null)
-        {
-            httpManager = new HttpsManager();
-        }
-        return httpManager;
+    private List<HttpOnNextListener> httpOnNextListenerList;
+    public HttpsUtils() {
+        httpOnNextListenerList = new ArrayList<>();
     }
-
-    public HttpsManager(){
-        builder = new OkHttpClient.Builder();
-    }
-
-
-
-
-
 
     /**
      * 返回数据监听
      * @param onNextListener
      * @return
      */
-    public HttpsManager setOnNextListener(HttpOnNextListener onNextListener){
-        listenerList.clear();
-        listenerList.add(onNextListener);
-        return this;
-    }
-
-    public HttpsManager setBaseProgress(BaseProgress baseProgress) {
-        this.baseProgress = baseProgress;
-        return this;
-    }
-
-    public static BaseProgress getBaseProgress() {
-        return baseProgress;
+    public void setOnNextListener(HttpOnNextListener onNextListener){
+        if(httpOnNextListenerList!=null)
+        {
+            httpOnNextListenerList.clear();
+            httpOnNextListenerList.add(onNextListener);
+        }else{
+            httpOnNextListenerList = new ArrayList<>();
+            httpOnNextListenerList.add(onNextListener);
+        }
     }
 
     /**
@@ -108,13 +83,13 @@ public class HttpsManager {
      * @param certificates 证书流
      * @return
      */
-    public HttpsManager setCer(InputStream... certificates){
+    public void setCertificate(InputStream... certificates) {
         this.inputStreams = certificates;
-        return this;
     }
 
-
-
+    public void setBaseProgress(BaseProgress baseProgress) {
+        this.baseProgress = baseProgress;
+    }
 
     /**
      * 处理http请求
@@ -123,9 +98,8 @@ public class HttpsManager {
      */
     public void doHttpDeal(final BaseApi basePar) {
         Retrofit retrofit = getReTrofit(basePar.getConnectionTime(), basePar.getBaseUrl());
-        if(listenerList!=null&&listenerList.size()>0)
+        if(httpOnNextListenerList!=null&&httpOnNextListenerList.size()>0)
         {
-            Log.i("httpsmanager", "onNext不为空");
             httpDeal(basePar.getObservable(retrofit), basePar);
         }
     }
@@ -140,7 +114,8 @@ public class HttpsManager {
      */
     public Retrofit getReTrofit(int connectTime, String baseUrl) {
 
-        if(StringUtil.isNoEmpty(cerName))
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        if(inputStreams!=null)
         {
             setCertificates(builder,inputStreams);
         }else{
@@ -160,7 +135,7 @@ public class HttpsManager {
         //手动创建一个OkHttpClient并设置超时时间缓存等设置
         builder.connectTimeout(connectTime, TimeUnit.SECONDS);
         if (RxRetrofitApp.isDebug()) {
-            builder.addInterceptor(getHttpLoggingInterceptor());
+            builder.addInterceptor(RxRetrofitApp.getRxRetrofitApp().getHttpLoggingInterceptor());
         }
 
         /*创建retrofit对象*/
@@ -181,69 +156,72 @@ public class HttpsManager {
      * @param basePar
      */
     public void httpDeal(Observable observable, BaseApi basePar) {
-        Log.i("httpDeal","进入");
+        if(RxRetrofitApp.isDebug())
+        {
+            Log.i("httpsManager","httpDeal");
+        }
         observable = observable.retryWhen(new RetryWhenNetworkException(basePar.getRetryCount(),
-                    basePar.getRetryDelay(), basePar.getRetryIncreaseDelay()))
+                basePar.getRetryDelay(), basePar.getRetryIncreaseDelay()))
                 /*异常处理*/
-                    .onErrorResumeNext(new ExceptionFunc())
+                .onErrorResumeNext(new ExceptionFunc())
                 /*生命周期管理*/
 //                    .compose(lifecycleProvider.get().bindToLifecycle())
-                    //Note:手动设置在activity onDestroy的时候取消订阅
+                //Note:手动设置在activity onDestroy的时候取消订阅
 //                .compose(appCompatActivity.get().bindUntilEvent(ActivityEvent.DESTROY))
                 /*返回数据统一判断*/
-                    .map(new ResulteFunc())
+                .map(new ResulteFunc())
                 /*http请求线程*/
-                    .subscribeOn(Schedulers.io())
-                    .unsubscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
                 /*回调线程*/
-                    .observeOn(AndroidSchedulers.mainThread());
+                .observeOn(AndroidSchedulers.mainThread());
 
         /*数据String回调*/
-            if (listenerList != null&&listenerList.size()>0) {
-                ProgressSubscriber subscriber = new ProgressSubscriber(basePar, listenerList.get(0));
-                observable.subscribe(subscriber);
-            }
+        if (httpOnNextListenerList != null&&httpOnNextListenerList.size()>0) {
+            ProgressSubscriber subscriber = new ProgressSubscriber(basePar, httpOnNextListenerList.get(0));
+            observable.subscribe(subscriber);
+        }
     }
 
-/**
- * 通过okhttpClient来设置证书
- * @param clientBuilder OKhttpClient.builder
- * @param certificates 读取证书的InputStream
- */
+    /**
+     * 通过okhttpClient来设置证书
+     * @param clientBuilder OKhttpClient.builder
+     * @param certificates 读取证书的InputStream
+     */
 
-public void setCertificates(OkHttpClient.Builder clientBuilder, InputStream... certificates) {
-    try {
-        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        keyStore.load(null);
-        int index = 0;
-        for (InputStream certificate : certificates) {
-            String certificateAlias = Integer.toString(index++);
-            keyStore.setCertificateEntry(certificateAlias, certificateFactory
-                    .generateCertificate(certificate));
-            try {
-                if (certificate != null)
-                    certificate.close();
-            } catch (IOException e) {
+    public void setCertificates(OkHttpClient.Builder clientBuilder, InputStream... certificates) {
+        try {
+            CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            keyStore.load(null);
+            int index = 0;
+            for (InputStream certificate : certificates) {
+                String certificateAlias = Integer.toString(index++);
+                keyStore.setCertificateEntry(certificateAlias, certificateFactory
+                        .generateCertificate(certificate));
+                try {
+                    if (certificate != null)
+                        certificate.close();
+                } catch (IOException e) {
+                }
             }
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(
+                    TrustManagerFactory.getDefaultAlgorithm());
+            trustManagerFactory.init(keyStore);
+            TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
+            if (trustManagers.length != 1 || !(trustManagers[0] instanceof X509TrustManager)) {
+                throw new IllegalStateException("Unexpected default trust managers:"
+                        + Arrays.toString(trustManagers));
+            }
+            X509TrustManager trustManager = (X509TrustManager) trustManagers[0];
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, trustManagerFactory.getTrustManagers(), new SecureRandom());
+            SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+            clientBuilder.sslSocketFactory(sslSocketFactory, trustManager);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(
-                TrustManagerFactory.getDefaultAlgorithm());
-        trustManagerFactory.init(keyStore);
-        TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
-        if (trustManagers.length != 1 || !(trustManagers[0] instanceof X509TrustManager)) {
-            throw new IllegalStateException("Unexpected default trust managers:"
-                    + Arrays.toString(trustManagers));
-        }
-        X509TrustManager trustManager = (X509TrustManager) trustManagers[0];
-        SSLContext sslContext = SSLContext.getInstance("TLS");
-        sslContext.init(null, trustManagerFactory.getTrustManagers(), new SecureRandom());
-        SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
-        clientBuilder.sslSocketFactory(sslSocketFactory, trustManager);
-    } catch (Exception e) {
-        e.printStackTrace();
     }
-}
 
 
     public class TrustAllCerts implements X509TrustManager {
@@ -282,26 +260,12 @@ public void setCertificates(OkHttpClient.Builder clientBuilder, InputStream... c
         }
     }
 
-
-    /**
-     * 日志输出
-     * 自行判定是否添加
-     *
-     * @return
-     */
-    private HttpLoggingInterceptor getHttpLoggingInterceptor() {
-        //日志显示级别
-        HttpLoggingInterceptor.Level level = HttpLoggingInterceptor.Level.BODY;
-        //新建log拦截器
-        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
-            @Override
-            public void log(String message) {
-                if (RxRetrofitApp.isDebug()) {
-                    Log.d("RxRetrofit", "Retrofit====Message:" + message);
-                }
-            }
-        });
-        loggingInterceptor.setLevel(level);
-        return loggingInterceptor;
+    @Override
+    public void release() {
+        if(httpOnNextListenerList!=null)
+        {
+            httpOnNextListenerList.clear();
+            httpOnNextListenerList = null;
+        }
     }
 }

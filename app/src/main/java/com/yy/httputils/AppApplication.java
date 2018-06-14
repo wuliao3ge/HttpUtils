@@ -5,6 +5,7 @@ import android.app.Application;
 import com.blankj.utilcode.util.Utils;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
+import com.yy.httputils.activity.progress.CustomProgressDialog;
 import com.yy.yhttputils.RxRetrofitApp;
 import com.yy.yhttputils.enums.NetType;
 import com.yy.yhttputils.http.HttpManager;
@@ -39,12 +40,13 @@ public class AppApplication extends Application {
 //        RxRetrofitApp.init(this,"https://www.izaodao.com/Api/");
 
 
-        Utils.init(this);
+
 
         LeakCanary.install(this);
         RxRetrofitApp.Create(this)
                 .setBaseUrl("https://www.izaodao.com/Api/")
                 .setDebug(true)
+                .setBaseProgress(new CustomProgressDialog())
                 .setNetType(NetType.NETTYPE_HTTPS)
                 .setProgressMassge("请求数据中,请稍等……");
     }

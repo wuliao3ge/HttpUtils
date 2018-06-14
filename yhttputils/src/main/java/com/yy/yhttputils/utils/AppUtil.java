@@ -4,12 +4,18 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import com.yy.yhttputils.base.BaseProgress;
+
 /**
  * 方法工具类
  * Created by ly on 17-7-26.
  */
 
 public class AppUtil {
+
+
+
+
     /**
      * 描述：判断网络是否有效.
      *

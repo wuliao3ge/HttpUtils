@@ -1,5 +1,6 @@
 package com.yy.httputils.activity.progress;
 import android.content.Context;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
@@ -17,6 +18,15 @@ public class CustomProgressDialog extends BaseProgress {
     private static String message;
     private static Context mContext;
 
+
+    public CustomProgressDialog() {
+        super();
+    }
+
+    public CustomProgressDialog(int themeResId) {
+        super(themeResId);
+    }
+
     public CustomProgressDialog(Context context) {
         super(context);
         this.mContext = context;
@@ -33,7 +43,7 @@ public class CustomProgressDialog extends BaseProgress {
 
     public void progressShow() {
         if (dialog == null) {
-            dialog = new CustomProgressDialog(mContext, R.style.Custom_Progress);
+            dialog = new CustomProgressDialog(R.style.Custom_Progress);
         }
         dialog.setContentView(R.layout.layout_progress_dialog);
 
@@ -50,6 +60,7 @@ public class CustomProgressDialog extends BaseProgress {
         lp.dimAmount = 0.1f;
         dialog.getWindow().setAttributes(lp);
         dialog.show();
+        Log.i("dialog","show");
     }
 
     @Override
@@ -75,6 +86,7 @@ public class CustomProgressDialog extends BaseProgress {
 
     public void dismissProgress() {
         dialog.dismiss();
+        Log.i("dialog","dismiss");
     }
 
     @Override

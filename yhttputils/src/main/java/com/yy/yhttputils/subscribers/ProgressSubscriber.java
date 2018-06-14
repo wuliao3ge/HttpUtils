@@ -3,8 +3,12 @@ package com.yy.yhttputils.subscribers;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 
 
+//import com.blankj.utilcode.util.ActivityUtils;
+//import com.blankj.utilcode.util.Utils;
+import com.yy.yhttputils.RxRetrofitApp;
 import com.yy.yhttputils.api.BaseApi;
 import com.yy.yhttputils.base.BaseProgress;
 import com.yy.yhttputils.exception.ApiException;
@@ -12,6 +16,8 @@ import com.yy.yhttputils.exception.CodeException;
 import com.yy.yhttputils.exception.HttpTimeException;
 //import com.yy.YHttpUtils.http.cookie.CookieResulte;
 import com.yy.yhttputils.listener.HttpOnNextListener;
+import com.yy.yhttputils.ui.widget.DialogActivity;
+import com.yy.yhttputils.utils.Utils;
 
 
 import java.lang.ref.SoftReference;
@@ -46,6 +52,7 @@ public class ProgressSubscriber<T> implements Observer<T> {
      * @param api
      */
     public ProgressSubscriber(BaseApi api,HttpOnNextListener  listenerSoftReference) {
+        this.pd = null;
         this.api = api;
         this.pd = api.getProgress();
         this.mSubscriberOnNextListener = listenerSoftReference;
@@ -62,32 +69,41 @@ public class ProgressSubscriber<T> implements Observer<T> {
     private void initProgressDialog(boolean cancel) {
 
 //        if (pd == null && context != null) {
-//            pd = new DefaultProgress(context);
+//
 //        }
-//        pd.setProgressMessage(api.getProgressMassge());
-//        pd.setCancelable(cancel);
-//        if (cancel) {
-//            pd.setOnCancelListener(new DialogInterface.OnCancelListener() {
-//                @Override
-//                public void onCancel(DialogInterface dialogInterface) {
-//                    onCancelProgress();
-//                    pd.onCance();
-//                }
-//            });
-//        }
+        if(!isShowPorgress()) return;
+        if(Utils.isAppForeground())
+        {
+            if(pd==null)
+            {
+                pd = new DefaultProgress(Utils.getTopActivityOrApp());
+            }
+            pd.setProgressMessage(api.getProgressMassge());
+            pd.setCancelable(cancel);
+            if (cancel) {
+                pd.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialogInterface) {
+                        onCancelProgress();
+                        pd.onCance();
+                    }
+                });
+            }
+        }
     }
 
 
     /**
      * 显示加载框
      */
-    private void showProgressDialog() {
-//        if (!isShowPorgress()) return;
-//        Context context = mActivity.get();
-//        if (pd == null || context == null) return;
-//        if (!pd.isProgressShowing()) {
-//            pd.progressShow();
-//        }
+     void showProgressDialog() {
+        if (!isShowPorgress()) return;
+        if(Utils.isAppForeground())
+        {
+            if (!pd.isProgressShowing()) {
+                pd.progressShow();
+            }
+        }
     }
 
 
@@ -95,10 +111,14 @@ public class ProgressSubscriber<T> implements Observer<T> {
      * 隐藏
      */
     private void dismissProgressDialog() {
-//        if (!isShowPorgress()) return;
-//        if (pd != null && pd.isProgressShowing()) {
-//            pd.dismissProgress();
-//        }
+        if (!isShowPorgress()) return;
+        if(Utils.isAppForeground())
+        {
+            if (pd != null && pd.isProgressShowing()) {
+                pd.dismissProgress();
+            }
+        }
+//        ActivityUtils.finishActivity(DialogActivity.class);
     }
 
 

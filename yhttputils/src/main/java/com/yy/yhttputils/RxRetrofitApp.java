@@ -6,6 +6,7 @@ import android.util.Log;
 import com.yy.yhttputils.base.BaseProgress;
 import com.yy.yhttputils.enums.NetType;
 import com.yy.yhttputils.http.HttpManager;
+import com.yy.yhttputils.utils.Utils;
 
 import okhttp3.logging.HttpLoggingInterceptor;
 
@@ -24,7 +25,12 @@ public class RxRetrofitApp {
     private static int downConnectonTime=6;
     private NetType netType = NetType.NETTYPE_HTTP;
 
+
+    private BaseProgress baseProgress;
+
     private RxRetrofitApp(Application application) {
+//        Utils.init(application);
+        Utils.init(application);
         this.application = application;
     }
 
@@ -96,6 +102,15 @@ public class RxRetrofitApp {
         return rxRetrofitApp;
     }
 
+
+    public BaseProgress getBaseProgress() {
+        return baseProgress;
+    }
+
+    public RxRetrofitApp setBaseProgress(BaseProgress baseProgress) {
+        this.baseProgress = baseProgress;
+        return rxRetrofitApp;
+    }
 
     /**
      * 日志输出

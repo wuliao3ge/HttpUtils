@@ -42,7 +42,8 @@ public abstract class BaseApi {
     /**
      * 自定义对话框
      */
-    private BaseProgress progress ;
+    private BaseProgress progress;
+//            = RxRetrofitApp.getRxRetrofitApp().getBaseProgress();
     /**
      * 提示消息
      */

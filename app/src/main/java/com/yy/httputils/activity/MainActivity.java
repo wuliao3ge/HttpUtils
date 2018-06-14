@@ -15,6 +15,7 @@ import com.daimajia.numberprogressbar.NumberProgressBar;
 import com.google.gson.Gson;
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 import com.yy.httputils.R;
+import com.yy.httputils.activity.progress.CustomProgressDialog;
 import com.yy.httputils.entity.api.BodyPostApi;
 import com.yy.httputils.entity.api.HttpsApi;
 import com.yy.httputils.entity.api.SubjectPostApi;
@@ -36,6 +37,7 @@ import java.util.ArrayList;
 import com.tbruyelle.rxpermissions2.Permission;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.yy.yhttputils.listener.UploadProgressListener;
+import com.yy.yhttputils.ui.widget.DialogActivity;
 import com.yy.yhttputils.upload.ProgressRequestBody;
 
 import io.reactivex.Observable;
@@ -167,8 +169,11 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
 
 //                httpsApi = new HttpsApi();
 //                httpsApi.setUrl("https://www.baidu.com/");
+//                postEntity.setProgress(new CustomProgressDialog(this));
                 HttpManager.getInstance().setOnNextListener(MainActivity.this)
                         .doHttpDeal(postEntity);
+//                Intent intent1 = new Intent(MainActivity.this, DialogActivity.class);
+//                startActivity(intent1);
                 break;
             case R.id.btn_rx_uploade:
                 /** 上传数据 */
